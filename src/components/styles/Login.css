@@ -1,0 +1,106 @@
+body {
+    font-family: Arial, sans-serif;
+    background: url("../images/image\ \(1\).jpg") center/cover;
+    /* background-size: 70%; */
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  
+  .login-container {
+    /* background: #fff; */
+    background: rgba(255, 255, 255, 0.9); /*Slight transparency */
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 320px;
+    text-align: center;
+  }
+  
+    .login-container img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        margin-bottom: 20px;
+    }
+  
+  
+  .login-container h2 {
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .input-group {
+    margin-bottom: 15px;
+    text-align: left;
+  }
+  
+  .input-group label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #333;
+  }
+  
+  .input-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+  }
+  
+  .password-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+  
+  .password-container input {
+    width: 100%;
+  }
+  
+  .password-container button {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: #007bff;
+  }
+  
+  .checkbox-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+  }
+  
+  .checkbox-group a {
+    color: #2e2f30;
+    text-decoration: none;
+  }
+  
+  .checkbox-group a:hover {
+    text-decoration: underline;
+  }
+  
+  .login-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: #087df3;
+    color: rgb(247, 243, 243);
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  
+  .login-btn:hover {
+    background-color: #edf1f6;
+  }
