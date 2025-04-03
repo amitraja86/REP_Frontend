@@ -538,28 +538,50 @@ const SearchFilter = () => {
   const handleDownload = (rowData) => {
     const filename = `Candidate_${rowData.Candidate_name.replace(/\s/g, "_")}.csv`;
 
+    // Define the headers (column titles)
+    const headers = [
+        "Candidate Name",
+        "Client",
+        "End Client",
+        "Position",
+        "Location",
+        "Country/City", 
+        "Interview Panel",
+        "Round",
+        "Status",
+        "Questions"
+    ];
+    const interviewPanel = rowData.Interview_Panel 
+    ? String(rowData.Interview_Panel) 
+    : "N/A";
+    const formattedPanel = interviewPanel
+      .split(",")
+      .map((line, i) => `${i + 1}. ${line}`)
+      .join(" "); // Format panel as a numbered list
+
     // Format questions as a numbered list
     const formattedQuestions = rowData.question
       .split("\n")
       .map((line, i) => `${i + 1}. ${line}`)
-      .join("\n");
+      .join("; ");  // Use semicolon instead of newline to keep it in one cell
 
-    // Convert data into CSV format
-    const csvData = [
-      ["Field", "Value"],
-      ["Candidate Name", rowData.Candidate_name],
-      ["Client", rowData.L1_Client],
-      ["End Client", rowData.End_Client],
-      ["Position", rowData.Positions],
-      ["Location", rowData.Location],
-      // ["Country/City", rowData.Country],
-      ["Interview Panel", rowData.Interview_Panel],
-      ["Round", rowData.Round],
-      ["Status", rowData.Status],
-      ["Questions", formattedQuestions],
-    ]
-      .map((row) => row.join(","))
-      .join("\n");
+    // Create a single row with corresponding values
+    const values = [
+        rowData.Candidate_name,
+        rowData.L1_Client,
+        rowData.End_Client,
+        rowData.Positions,
+        rowData.Location,
+        rowData.Country,
+        // rowData.Interview_Panel,
+        formattedPanel,
+        rowData.Round,
+        rowData.Status,
+        formattedQuestions
+    ];
+
+    // Convert to CSV format (column-wise)
+    const csvData = [headers, values].map(row => row.join(",")).join("\n");
 
     // Create and download CSV file
     const blob = new Blob([csvData], { type: "text/csv" });
@@ -569,7 +591,8 @@ const SearchFilter = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  };
+};
+
   const handleSearch = async () => {
     if (!selectedFilters.position && !selectedFilters.client && !selectedFilters.panel) {
       alert("Please select at least one filter or enter a search term!");
