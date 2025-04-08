@@ -1,106 +1,179 @@
-body {
-    font-family: Arial, sans-serif;
-    background: url("../images/image\ \(1\).jpg") center/cover;
-    /* background-size: 70%; */
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-  }
+/* Container */
+.login-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  background: #ede9e9;
+  position: relative; 
+}
+
+/* Logo */
+.appzlogic-logo {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 120px;
+  height: auto;
   
-  .login-container {
-    /* background: #fff; */
-    background: rgba(255, 255, 255, 0.9); /*Slight transparency */
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 320px;
-    text-align: center;
-  }
-  
-    .login-container img {
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        margin-bottom: 20px;
-    }
-  
-  
-  .login-container h2 {
-    margin-bottom: 20px;
-    color: #333;
-  }
-  
-  .input-group {
-    margin-bottom: 15px;
-    text-align: left;
-  }
-  
-  .input-group label {
-    display: block;
-    font-size: 14px;
-    margin-bottom: 5px;
-    color: #333;
-  }
-  
-  .input-group input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 14px;
-  }
-  
-  .password-container {
-    display: flex;
-    align-items: center;
-    position: relative;
-  }
-  
-  .password-container input {
-    width: 100%;
-  }
-  
-  .password-container button {
-    position: absolute;
-    right: 10px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 14px;
-    color: #007bff;
-  }
-  
-  .checkbox-group {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 14px;
-  }
-  
-  .checkbox-group a {
-    color: #2e2f30;
-    text-decoration: none;
-  }
-  
-  .checkbox-group a:hover {
-    text-decoration: underline;
-  }
-  
-  .login-btn {
-    width: 100%;
-    padding: 10px;
-    background-color: #087df3;
-    color: rgb(247, 243, 243);
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 10px;
-  }
-  
-  .login-btn:hover {
-    background-color: #edf1f6;
-  }
+}
+
+/* Left Section */
+.login-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #ede9e9;
+  padding: 20px;
+  position: relative;
+}
+
+.illustration {
+  /* width: 80%; */
+  /* max-width: 600px;   */
+  position: absolute;
+  top: 45%;  
+  left: 50%;
+  transform: translate(-50%, -30%);
+  z-index: 2;
+}
+
+.login-left h1 {
+  font-size: 30px;
+  font-weight: bold;
+  text-align: center;
+  z-index: 3;
+  margin-top: -350px;
+  position: relative;
+}
+
+.login-left h4 {
+  font-size: 16px;
+  text-align: center;
+  color: gray;
+  z-index: 3;
+  margin-top: 0px;
+  position: relative;
+}
+
+/* Right Section */
+.login-right  {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  max-width: 400px;
+  margin: auto;
+  margin-right: 100px;
+}
+
+.login-right h2 {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* Input Fields */
+.input-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+label {
+  font-size: 14px;
+  font-weight: bold;
+  color: gray;
+  margin-bottom: 5px;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  background: #f4f4f4;
+  outline: none;
+}
+
+input:focus {
+  border-color: #007bff;
+  background: #fff;
+}
+
+/* Buttons */
+.btn-submit,
+.btn-google {
+  padding: 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.btn-submit {
+  background-color: #4c8bf5;
+  color: #fff;
+  border: none;
+  width: 100%;
+}
+
+.btn-submit:hover {
+  background-color: #3a76d3;
+}
+
+.btn-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  color: black;
+  border: 1px solid #ccc;
+}
+
+.btn-google:hover {
+  background: #f1f1f1;
+}
+
+.google-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+/* Signup and Checkbox */
+.signup-link {
+  color: #ff6600;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.signup-link:hover {
+  text-decoration: underline;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.checkbox-group a {
+  color: #1e72c5;
+  text-decoration: none;
+}
+
+.checkbox-group a:hover {
+  text-decoration: underline;
+}

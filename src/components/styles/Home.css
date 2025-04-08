@@ -86,7 +86,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-image: url("../images/image\ \(1\).jpg"); 
+  background-image: url("../images/fluent_web_light.png"); 
   background-size: cover;
   background-position: center;
   
@@ -119,13 +119,27 @@ button {
   width: 100%;
   margin-left: 120px;
   background-image: url("../images/Interview\ img.jpg");
-  background-size: contain;
+  /* background-size: contain; */
   backdrop-filter:  blur(5px);
   background-repeat: no-repeat;
   background-position: right ;
 }
 
+.welcome-text h1 {
+  font-size: 30px;
+  font-weight: bold;
+  color: #2b435b;
+  margin-bottom: 20px;
+  /* text-align: center; */
+}
 
+.welcome-text h3 {
+  font-size: 25px;
+  font-weight: bold;
+  color: #2b435b;
+  margin-bottom: 20px;
+  /* text-align: center; */
+}
 
 .line{
   font-size: 14px;

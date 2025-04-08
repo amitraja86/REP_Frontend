@@ -109,7 +109,7 @@
   border-radius: 5px;
   padding: 5px;
   border: 1px solid #ccc;
-}
+} 
 
 /* Search input */
 .search-box {
@@ -136,7 +136,7 @@
   z-index: 999;
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin-left: 80px;
 }
 
 /* Individual search suggestion item */
@@ -192,7 +192,7 @@
 
 
 .search-btn {
-  background: #f5f6f7;
+  background: #ffffff;
   border: none;
   color: #2f384f;
   padding: 10px 15px;
@@ -203,7 +203,7 @@
 
 
 .search-btn:hover {
-  background: #1a2b3c;
+  background: #263a4e;
   color: #fff;
 }
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./styles/Navbar.css";
-import logo from "../components/images/Appzlogic logo.png"; // Ensure the path is correct
+import logo from "../components/images/images-2-removebg-preview 1.png"; // Ensure the path is correct
 
 const Navbar = () => {
   const navigate = useNavigate();
