@@ -16,12 +16,12 @@
 }
 
 .navbar-logo {
-  height: 50px; /* Adjust based on your logo size */
+  height: 35px; /* Adjust based on your logo size */
   margin-right: 10px;
 }
 
 .navbar-title {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
   color: #27435f;
 }
@@ -43,7 +43,7 @@
 .nav-links a:hover {
   color: #073563;
 }
-.logout-button {
+/* .logout-button {
   background-color: #2b435b;
   color: white;
   padding: 5px 10px;
@@ -52,4 +52,4 @@
   font-weight: bold;
   transition: background-color 0.3s ease;
   cursor: pointer;
-}
+} */

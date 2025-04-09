@@ -82,7 +82,7 @@ const Form = () => {
     panel: "",
     dateTime: "",
     round: 1,
-    status: "",
+    status: "pass",
     questionSet: null,
     manualQuestions: "",
   });
@@ -97,7 +97,7 @@ const Form = () => {
       panel: "",
       dateTime: "",
       round: 1,
-      status: "",
+      status: "pass",
       questionSet: null,
       manualQuestions: "",
     });

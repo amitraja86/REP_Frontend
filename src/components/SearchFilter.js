@@ -417,7 +417,7 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef } from "react";
 import { FaSearch } from "react-icons/fa";
 import axios from "axios";
 import "./styles/SearchFilter.css";
@@ -427,6 +427,7 @@ const SearchFilter = () => {
   // State to manage dropdown visibility
   const [showDropdown, setShowDropdown] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const dropdownRef = useRef(null);
 
   // State for selected filters
   const [selectedFilters, setSelectedFilters] = useState({
@@ -477,9 +478,46 @@ const SearchFilter = () => {
   const toggleDropdown = () => setShowDropdown(!showDropdown);
 
   // Toggle sub-dropdowns for filters
+  // const toggleSubDropdown = (filter) => {
+  //   setSubDropdowns((prev) => ({ ...prev, [filter]: !prev[filter] }));
+  // };
+
   const toggleSubDropdown = (filter) => {
-    setSubDropdowns((prev) => ({ ...prev, [filter]: !prev[filter] }));
+    setSubDropdowns((prev) => {
+      // Close all dropdowns before opening the new one
+      const updatedState = {
+        position: false,
+        client: false,
+        panel: false,
+      };
+      
+      // Toggle the selected filter to open
+      updatedState[filter] = !prev[filter];
+      return updatedState;
+    });
   };
+    // Close all dropdowns if clicking outside
+    useEffect(() => {
+      const handleClickOutside = (event) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+          // Close all dropdowns if clicked outside
+          setSubDropdowns({
+            position: false,
+            client: false,
+            panel: false,
+          });
+          setShowDropdown(false); // Close the main dropdown if needed
+          setFilteredSuggestions(false); 
+        }
+      };
+  
+      document.addEventListener('mousedown', handleClickOutside);
+  
+      // Cleanup the event listener
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }, []);
 
   // Handle selection of filters from dropdown
   const handleSelectFilter = (filter, value) => {
@@ -547,6 +585,7 @@ const SearchFilter = () => {
         "Location",
         "Country/City", 
         "Interview Panel",
+        "Date",
         "Round",
         "Status",
         "Questions"
@@ -574,6 +613,7 @@ const SearchFilter = () => {
         rowData.Location,
         rowData.Country,
         // rowData.Interview_Panel,
+        rowData.Date,
         formattedPanel,
         rowData.Round,
         rowData.Status,
@@ -645,7 +685,7 @@ const SearchFilter = () => {
   
 
   return (
-    <div className="search">
+    <div ref={dropdownRef} className="search">
       {/* Search bar with filter button and clear button */}
       <div className="search-bar">
         <button className="filter-btn" onClick={toggleDropdown}>
@@ -692,23 +732,24 @@ const SearchFilter = () => {
         <div className="filter-dropdown">
           <ul>
             <li>
-              <button onClick={() => toggleSubDropdown("position")}>
+              <li onClick={() => toggleSubDropdown("position")}>
                 Position
-              </button>
+              </li>
               {subDropdowns.position && (
                 <ul className="sub-dropdown">
                   {positions.map((pos) => (
-                    <li key={pos} onClick={() => handleSelectFilter("position", pos)}>
-                      {pos}
-                    </li>
-                  ))}
+                  <li key={pos} onClick={() => handleSelectFilter("position", pos)}>
+                    {pos}
+                  </li>
+                ))}
+                
                 </ul>
               )}
             </li>
             <li>
-              <button onClick={() => toggleSubDropdown("client")}>
+              <li onClick={() => toggleSubDropdown("client")}>
                 Client
-              </button>
+              </li>
               {subDropdowns.client && (
                 <ul className="sub-dropdown">
                   {clients.map((client) => (
@@ -720,9 +761,9 @@ const SearchFilter = () => {
               )}
             </li>
             <li>
-              <button onClick={() => toggleSubDropdown("panel")}>
+              <li onClick={() => toggleSubDropdown("panel")}>
                 Panel
-              </button>
+              </li>
               {subDropdowns.panel && (
                 <ul className="sub-dropdown">
                   {panels.map((panel) => (
@@ -741,62 +782,66 @@ const SearchFilter = () => {
       {error && <p style={{ color: "red" }}>{error}</p>}
 
       {showResults && searchResults.length > 0 && (
-        <div className="search-results">
-          
-          <table>
-            <thead>
-              <tr>
-                <th>Candidate Name</th>
-                <th>Client</th>
-                <th>End Client</th>
-                <th>Position</th>
-                <th>Location</th>
-                <th>Country/City</th>
-                <th>Interview Panel</th>
-                <th>Round</th>
-                <th>Status</th>
-                <th>Question</th>
-                <th>Download 
-                <button className="close-btn" onClick={() => setShowResults(false)}>✖</button>
-                </th>
-              </tr>
-            </thead>
-            
-            <tbody>
-              {searchResults.map((result, index) => (
-                <tr key={index}>
-                  <td>{result.Candidate_name}</td>
-                  <td>{result.L1_Client}</td>
-                  <td>{result.End_Client}</td>
-                  <td>{result.Positions}</td>
-                  <td>{result.Location}</td>
-                  <td>{result.Country}</td>
-                  <td>
-                      <ol>
-                         {String(result.Interview_Panel).split(",").map((line, i) => (
-                         <li key={i}>{line}</li>
-                         ))}
-                      </ol>
-                  </td>
-                  <td>{result.Round}</td>
-                  <td>{result.Status}</td>
-                  {/* <td>{result.question}</td> */}
-                  <td>
-                      <ol>
-                         {result.question.split("\n").map((line, i) => (
-                         <li key={i}>{line}</li>
-                         ))}
-                      </ol>
-                  </td>
-                  <td>
-                      <button className="download-btn" onClick={() => handleDownload(result)}>Download</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+  <div className="search-results">
+    <div className="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Candidate Name</th>
+            <th>Client</th>
+            <th>End Client</th>
+            <th>Position</th>
+            {/* <th>Location</th>
+            <th>Country/City</th> */}
+            <th>Interview Panel</th>
+            <th>Date</th>
+            {/* <th>Round</th>
+            <th>Status</th> */}
+            <th className="question">Question</th>
+            <th>
+              Download
+              <button className="close-btn" onClick={() => setShowResults(false)}>✖</button>
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {searchResults.map((result, index) => (
+            <tr key={index}>
+              <td>{result.Candidate_name}</td>
+              <td>{result.L1_Client}</td>
+              <td>{result.End_Client}</td>
+              <td>{result.Positions}</td>
+              {/* <td>{result.Location}</td>
+              <td>{result.Country}</td> */}
+              <td>
+                <ol>
+                  {String(result.Interview_Panel).split(",").map((line, i) => (
+                    <li key={i}>{line}</li>
+                  ))}
+                </ol>
+              </td>
+              <td>{result.Interview_starttime}</td>
+              {/* <td>{result.Round}</td>
+              <td>{result.Status}</td> */}
+              <td>
+                <ol className="question-list"> 
+                  {result.question.split("\n").map((line, i) => (
+                    <li key={i}>{line}</li>
+                  ))}
+                </ol>
+              </td>
+              <td>
+                <button className="download-btn" onClick={() => handleDownload(result)}>Download</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+)}
+      
     </div>
   );
 };
