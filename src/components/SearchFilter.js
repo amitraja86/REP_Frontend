@@ -232,7 +232,7 @@
 
 //     try{
 //       console.log()
-//       const response = await axios.get(`http://127.0.0.1:8000/question/?company_name=${encodeURIComponent(client)}&position=${encodeURIComponent(position)}&panel_name=${encodeURIComponent(panel)}
+//       const response = await axios.get(`https://recruitment-intelligence.appzlogic.in/api/question/?company_name=${encodeURIComponent(client)}&position=${encodeURIComponent(position)}&panel_name=${encodeURIComponent(panel)}
 // `)
 //       console.log("Search successful:", response.data);
 //       alert("Search successful!");
@@ -320,22 +320,22 @@
   
 
 //   // useEffect(() => {
-//   //   axios.get('http://127.0.0.1:8000/positions/')
+//   //   axios.get('https://recruitment-intelligence.appzlogic.in/api/positions/')
 //   //   .then(response => setPositions(response.data))
 //   //   .catch(error => console.log(error));
   
-//   //   axios.get('http://127.0.0.1:8000/company/')
+//   //   axios.get('https://recruitment-intelligence.appzlogic.in/api/company/')
 //   //       .then(response => setCompanies(response.data))
 //   //       .catch(error => console.log(error));
     
-//   //   axios.get('http://127.0.0.1:8000/panel/')
+//   //   axios.get('https://recruitment-intelligence.appzlogic.in/api/panel/')
 //   //       .then(response => setPanel(response.data))
 //   //       .catch(error => console.log(error));    
 //   // }, [filters]);
   
 //   // useEffect(() => {
 //   //   const { position, company, panel } = filters;
-//   //   axios.get('http://127.0.0.1:8000/question/', {
+//   //   axios.get('https://recruitment-intelligence.appzlogic.in/api/question/', {
 //   //     params: { position, company_name: company, panel_name: panel }
 //   //   })
 //   //   .then(response => setSearchResults(response.data.details))
@@ -361,7 +361,7 @@
 //     }
 //     try {
 //       const response = await axios.get(
-//         `http://127.0.0.1:8000/question/?company_name=${encodeURIComponent(company)}&position=${encodeURIComponent(position)}&panel_name=${encodeURIComponent(panel)}`)
+//         `https://recruitment-intelligence.appzlogic.in/api/question/?company_name=${encodeURIComponent(company)}&position=${encodeURIComponent(position)}&panel_name=${encodeURIComponent(panel)}`)
 //       console.log("Search successful:", response.data);
 //       alert("Search successful!");
 //       } catch (error) {
@@ -459,9 +459,9 @@ const SearchFilter = () => {
   useEffect(() => {
     const fetchFilters = async () => {
       try {
-        const positionResponse = await axios.get("http://127.0.0.1:8000/positions/");
-        const clientResponse = await axios.get("http://127.0.0.1:8000/company/");
-        const panelResponse = await axios.get("http://127.0.0.1:8000/panels/");
+        const positionResponse = await axios.get("https://recruitment-intelligence.appzlogic.in/api/positions/");
+        const clientResponse = await axios.get("https://recruitment-intelligence.appzlogic.in/api/company/");
+        const panelResponse = await axios.get("https://recruitment-intelligence.appzlogic.in/api/panels/");
 
         setPositions(positionResponse.data);
         setClients(clientResponse.data);
@@ -662,7 +662,7 @@ const SearchFilter = () => {
 
       const token = localStorage.getItem("token");
 
-      const response = await axios.get(`http://127.0.0.1:8000/question/?${params.toString()}`, {
+      const response = await axios.get(`https://recruitment-intelligence.appzlogic.in/api/question/?${params.toString()}`, {
         headers: {
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",

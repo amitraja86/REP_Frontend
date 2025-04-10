@@ -141,8 +141,8 @@ const Form = () => {
     const token = localStorage.getItem("token");
     const apiUrl =
       inputType === "manual"
-        ? "http://127.0.0.1:8000/add_questions/"
-        : "http://127.0.0.1:8000/add_question_by_csv/";
+        ? "https://recruitment-intelligence.appzlogic.in/api/add_questions/"
+        : "https://recruitment-intelligence.appzlogic.in/api/add_question_by_csv/";
 
         const convertDateTime = (isoDateTime) => {
           if (!isoDateTime) return "";

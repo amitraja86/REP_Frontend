@@ -78,7 +78,7 @@
 
 //     try {
 //       const response = await axios.get(
-//         `http://127.0.0.1:8000/user/login/?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+//         `https://recruitment-intelligence.appzlogic.in/api/user/login/?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
 //       );
 //       console.log("Login successful:", response.data);
 //       const { access_token } = response.data;
@@ -161,7 +161,7 @@ const Login = () => {
 
     try {
       const response = await axios.get(
-        `http://127.0.0.1:8000/user/login/?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+        `https://recruitment-intelligence.appzlogic.in/api/user/login/?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
       );
       console.log("Login successful:", response.data);
       const { access_token } = response.data;
