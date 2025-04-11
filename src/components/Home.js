@@ -28,12 +28,13 @@ const Home = () => {
       <Navbar />
       <div className="content">
         <SearchFilter />
+        <Form />
         <div className="welcome-text">
-          <h1>Transform Your Hiring with Recruitment <br/>Intelligence.</h1>
+          <h1>Transform Your Hiring with Recruitment Intelligence.</h1>
           <h3>Smart. Efficient. Insightful.</h3>
           <p className="line">Finding the right talent doesn’t have to be a challenge.<br/> Our Recruitment Intelligence streamlines the hiring process, <br/>helping businesses identify, engage, and onboard top candidates faster than ever.</p>  
         </div>
-        <Form />
+        
       </div>
     </div>
   );

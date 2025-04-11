@@ -417,45 +417,40 @@
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-import React, { useState, useEffect,useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FaSearch } from "react-icons/fa";
 import axios from "axios";
 import "./styles/SearchFilter.css";
 import filterIcon from "../components/images/filter.png";
 
 const SearchFilter = () => {
-  // State to manage dropdown visibility
   const [showDropdown, setShowDropdown] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const dropdownRef = useRef(null);
 
-  // State for selected filters
   const [selectedFilters, setSelectedFilters] = useState({
     position: "",
     client: "",
     panel: "",
   });
 
-  // State for search input and results
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [copiedRow, setCopiedRow] = useState(null);
 
-  // Store API data for dropdown options
   const [positions, setPositions] = useState([]);
   const [clients, setClients] = useState([]);
   const [panels, setPanels] = useState([]);
-  const [filteredSuggestions, setFilteredSuggestions] = useState([]); // Suggestions for search bar
+  const [filteredSuggestions, setFilteredSuggestions] = useState([]);
 
-  // State to control sub-dropdown visibility
   const [subDropdowns, setSubDropdowns] = useState({
     position: false,
     client: false,
     panel: false,
   });
 
-  // Fetch dropdown data from API
   useEffect(() => {
     const fetchFilters = async () => {
       try {
@@ -474,56 +469,32 @@ const SearchFilter = () => {
     fetchFilters();
   }, []);
 
-  // Toggle main filter dropdown
   const toggleDropdown = () => setShowDropdown(!showDropdown);
 
-  // Toggle sub-dropdowns for filters
-  // const toggleSubDropdown = (filter) => {
-  //   setSubDropdowns((prev) => ({ ...prev, [filter]: !prev[filter] }));
-  // };
-
   const toggleSubDropdown = (filter) => {
-    setSubDropdowns((prev) => {
-      // Close all dropdowns before opening the new one
-      const updatedState = {
-        position: false,
-        client: false,
-        panel: false,
-      };
-      
-      // Toggle the selected filter to open
-      updatedState[filter] = !prev[filter];
-      return updatedState;
-    });
+    setSubDropdowns((prev) => ({
+      position: false,
+      client: false,
+      panel: false,
+      [filter]: !prev[filter],
+    }));
   };
-    // Close all dropdowns if clicking outside
-    useEffect(() => {
-      const handleClickOutside = (event) => {
-        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-          // Close all dropdowns if clicked outside
-          setSubDropdowns({
-            position: false,
-            client: false,
-            panel: false,
-          });
-          setShowDropdown(false); // Close the main dropdown if needed
-          setFilteredSuggestions(false); 
-        }
-      };
-  
-      document.addEventListener('mousedown', handleClickOutside);
-  
-      // Cleanup the event listener
-      return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
-      };
-    }, []);
 
-  // Handle selection of filters from dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setSubDropdowns({ position: false, client: false, panel: false });
+        setShowDropdown(false);
+        setFilteredSuggestions([]);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const handleSelectFilter = (filter, value) => {
     setSelectedFilters((prev) => ({ ...prev, [filter]: value }));
-
-    // Update search bar based on selected filters
     const updatedSearchTerm = [
       filter === "position" ? value : selectedFilters.position,
       filter === "client" ? value : selectedFilters.client,
@@ -531,22 +502,19 @@ const SearchFilter = () => {
     ]
       .filter(Boolean)
       .join(", ");
-
     setSearchTerm(updatedSearchTerm);
-    setSubDropdowns((prev) => ({ ...prev, [filter]: false })); // Close dropdown
+    setSubDropdowns((prev) => ({ ...prev, [filter]: false }));
   };
 
-  // Handle typing in search bar & show suggestions
   const handleSearchTermChange = (e) => {
     const inputValue = e.target.value;
     setSearchTerm(inputValue);
 
     if (!inputValue.trim()) {
-      setFilteredSuggestions([]); // Clear suggestions if empty
+      setFilteredSuggestions([]);
       return;
     }
 
-    // Filter matching items from available filters
     const matchedPositions = positions.filter((pos) =>
       pos.toLowerCase().includes(inputValue.toLowerCase())
     );
@@ -557,7 +525,6 @@ const SearchFilter = () => {
       panel.toLowerCase().includes(inputValue.toLowerCase())
     );
 
-    // Combine results into one list
     setFilteredSuggestions([
       ...matchedPositions.map((pos) => ({ type: "position", value: pos })),
       ...matchedClients.map((client) => ({ type: "client", value: client })),
@@ -565,65 +532,46 @@ const SearchFilter = () => {
     ]);
   };
 
-  // Handle selection from search bar suggestions
   const handleSelectSuggestion = (suggestion) => {
     handleSelectFilter(suggestion.type, suggestion.value);
     setSearchTerm(suggestion.value);
-    setFilteredSuggestions([]); // Hide suggestions after selection
+    setFilteredSuggestions([]);
   };
 
-  // Download candidate data as CSV
   const handleDownload = (rowData) => {
     const filename = `Candidate_${rowData.Candidate_name.replace(/\s/g, "_")}.csv`;
-
-    // Define the headers (column titles)
     const headers = [
-        "Candidate Name",
-        "Client",
-        "End Client",
-        "Position",
-        "Location",
-        "Country/City", 
-        "Interview Panel",
-        "Date",
-        "Round",
-        "Status",
-        "Questions"
+      "Candidate Name",
+      "Client",
+      "End Client",
+      "Position",
+      "Interview Panel",
+      "Date",
+      "Questions"
     ];
-    const interviewPanel = rowData.Interview_Panel 
-    ? String(rowData.Interview_Panel) 
-    : "N/A";
-    const formattedPanel = interviewPanel
+
+    const formattedPanel = String(rowData.Interview_Panel)
       .split(",")
       .map((line, i) => `${i + 1}. ${line}`)
-      .join(" "); // Format panel as a numbered list
+      .join(" ");
 
-    // Format questions as a numbered list
     const formattedQuestions = rowData.question
       .split("\n")
       .map((line, i) => `${i + 1}. ${line}`)
-      .join("; ");  // Use semicolon instead of newline to keep it in one cell
+      .join("; ");
 
-    // Create a single row with corresponding values
     const values = [
-        rowData.Candidate_name,
-        rowData.L1_Client,
-        rowData.End_Client,
-        rowData.Positions,
-        rowData.Location,
-        rowData.Country,
-        // rowData.Interview_Panel,
-        rowData.Date,
-        formattedPanel,
-        rowData.Round,
-        rowData.Status,
-        formattedQuestions
+      rowData.Candidate_name,
+      rowData.L1_Client,
+      rowData.End_Client,
+      rowData.Positions,
+      formattedPanel,
+      rowData.Interview_starttime,
+      formattedQuestions
     ];
 
-    // Convert to CSV format (column-wise)
-    const csvData = [headers, values].map(row => row.join(",")).join("\n");
+    const csvData = [headers, values].map((row) => row.join(",")).join("\n");
 
-    // Create and download CSV file
     const blob = new Blob([csvData], { type: "text/csv" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
@@ -631,7 +579,7 @@ const SearchFilter = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-};
+  };
 
   const handleSearch = async () => {
     if (!selectedFilters.position && !selectedFilters.client && !selectedFilters.panel) {
@@ -639,20 +587,12 @@ const SearchFilter = () => {
       return;
     }
 
-    setShowDropdown(false);
-    setSubDropdowns({ position: false, client: false, panel: false });
-    setFilteredSuggestions([]); // Clear suggestions
-
-
-
     setLoading(true);
     setShowDropdown(false);
     setSubDropdowns({ position: false, client: false, panel: false });
+    setFilteredSuggestions([]);
     setError("");
     setSearchResults([]);
-    setShowResults(true); // Show results section
-   
-
 
     try {
       const params = new URLSearchParams();
@@ -664,9 +604,9 @@ const SearchFilter = () => {
 
       const response = await axios.get(`https://recruitment-intelligence.appzlogic.in/api/question/?${params.toString()}`, {
         headers: {
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
-          "token": token,
+          token: token,
         },
       });
 
@@ -674,6 +614,7 @@ const SearchFilter = () => {
         setError("No results found.");
       } else {
         setSearchResults(response.data.details);
+        setShowResults(true);
       }
     } catch (error) {
       console.error("Search error:", error.response?.data || error.message);
@@ -682,17 +623,14 @@ const SearchFilter = () => {
       setLoading(false);
     }
   };
-  
 
   return (
     <div ref={dropdownRef} className="search">
-      {/* Search bar with filter button and clear button */}
       <div className="search-bar">
         <button className="filter-btn" onClick={toggleDropdown}>
           <img src={filterIcon} alt="Filter" className="filter-icon" />
         </button>
 
-        {/* Search Input */}
         <input
           type="text"
           className="search-box"
@@ -701,22 +639,20 @@ const SearchFilter = () => {
           onChange={handleSearchTermChange}
         />
         {searchTerm && (
-          <button className="clear-btn" onClick={() => { setSearchTerm("");
+          <button className="clear-btn" onClick={() => {
+            setSearchTerm("");
             setSelectedFilters({ position: "", client: "", panel: "" });
             setSearchResults([]);
             setFilteredSuggestions([]);
             setShowResults(false);
-            setError("");}}>
-            X
-          </button>
+            setError("");
+          }}>X</button>
         )}
         <button className="search-btn" onClick={handleSearch}>
-          
           <FaSearch />
         </button>
       </div>
 
-      {/* Dropdown suggestions */}
       {filteredSuggestions.length > 0 && (
         <ul className="search-suggestions">
           {filteredSuggestions.map((suggestion, index) => (
@@ -727,121 +663,93 @@ const SearchFilter = () => {
         </ul>
       )}
 
-      {/* Filter dropdown */}
       {showDropdown && (
         <div className="filter-dropdown">
           <ul>
-            <li>
-              <li onClick={() => toggleSubDropdown("position")}>
-                Position
+            {["position", "client", "panel"].map((filter) => (
+              <li key={filter} onClick={() => toggleSubDropdown(filter)}>
+                {filter.charAt(0).toUpperCase() + filter.slice(1)}
+                {subDropdowns[filter] && (
+                  <ul className="sub-dropdown">
+                    {(filter === "position" ? positions :
+                      filter === "client" ? clients : panels
+                    ).map((item) => (
+                      <li key={item} onClick={() => handleSelectFilter(filter, item)}>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </li>
-              {subDropdowns.position && (
-                <ul className="sub-dropdown">
-                  {positions.map((pos) => (
-                  <li key={pos} onClick={() => handleSelectFilter("position", pos)}>
-                    {pos}
-                  </li>
-                ))}
-                
-                </ul>
-              )}
-            </li>
-            <li>
-              <li onClick={() => toggleSubDropdown("client")}>
-                Client
-              </li>
-              {subDropdowns.client && (
-                <ul className="sub-dropdown">
-                  {clients.map((client) => (
-                    <li key={client} onClick={() => handleSelectFilter("client", client)}>
-                      {client}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
-            <li>
-              <li onClick={() => toggleSubDropdown("panel")}>
-                Panel
-              </li>
-              {subDropdowns.panel && (
-                <ul className="sub-dropdown">
-                  {panels.map((panel) => (
-                    <li key={panel} onClick={() => handleSelectFilter("panel", panel)}>
-                      {panel}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
+            ))}
           </ul>
         </div>
       )}
 
-      {loading && <p>Loading...</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {loading && (
+        <div className="loading-spinner-container">
+          <div className="spinner"></div>
+            <span className="loading-text">Loading...</span>
+        </div>
+      )}
 
-      {showResults && searchResults.length > 0 && (
-  <div className="search-results">
-    <div className="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Candidate Name</th>
-            <th>Client</th>
-            <th>End Client</th>
-            <th>Position</th>
-            {/* <th>Location</th>
-            <th>Country/City</th> */}
-            <th>Interview Panel</th>
-            <th>Date</th>
-            {/* <th>Round</th>
-            <th>Status</th> */}
-            <th className="question">Question</th>
-            <th>
-              Download
-              <button className="close-btn" onClick={() => setShowResults(false)}>✖</button>
-            </th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {searchResults.map((result, index) => (
-            <tr key={index}>
-              <td>{result.Candidate_name}</td>
-              <td>{result.L1_Client}</td>
-              <td>{result.End_Client}</td>
-              <td>{result.Positions}</td>
-              {/* <td>{result.Location}</td>
-              <td>{result.Country}</td> */}
-              <td>
-                <ol>
-                  {String(result.Interview_Panel).split(",").map((line, i) => (
-                    <li key={i}>{line}</li>
+      {showResults && (
+        <div className="overlay">
+          <div className="results-modal">
+            <button className="close-modal-btn" onClick={() => setShowResults(false)}>×</button>
+            <div className="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Candidate Name</th>
+                    <th>Client</th>
+                    <th>End Client</th>
+                    <th>Position</th>
+                    <th>Interview Panel</th>
+                    <th>Date</th>
+                    <th>Questions</th>
+                    <th>Download</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {searchResults.map((result, index) => (
+                    <tr key={index}>
+                      <td>{result.Candidate_name}</td>
+                      <td>{result.L1_Client}</td>
+                      <td>{result.End_Client}</td>
+                      <td>{result.Positions}</td>
+                      <td>
+                        <ol>{String(result.Interview_Panel).split(",").map((line, i) => <li key={i}>{line}</li>)}</ol>
+                      </td>
+                      <td>{result.Interview_starttime}</td>
+                      <td className="question-cell">
+                          <div className="question-scroll">
+                              <ol className="question-list">
+                                 {result.question.split("\n").map((line, i) => (
+                                 <li key={i}>{line}</li>
+                                 ))}
+                             </ol>
+                          </div>
+                         <button className="copy-btn" onClick={() => {
+                                 navigator.clipboard.writeText(result.question);
+                                 setCopiedRow(index);
+                                 setTimeout(() => setCopiedRow(null), 2000); // Reset 
+                                }}
+                                 title="Copy All Questions"
+                        >📋 </button>
+                        {copiedRow === index && (
+                             <span className="copied-text">Copied!</span>
+                        )}
+                      </td>
+                      <td><button onClick={() => handleDownload(result)}>Download</button></td>
+                    </tr>
                   ))}
-                </ol>
-              </td>
-              <td>{result.Interview_starttime}</td>
-              {/* <td>{result.Round}</td>
-              <td>{result.Status}</td> */}
-              <td>
-                <ol className="question-list"> 
-                  {result.question.split("\n").map((line, i) => (
-                    <li key={i}>{line}</li>
-                  ))}
-                </ol>
-              </td>
-              <td>
-                <button className="download-btn" onClick={() => handleDownload(result)}>Download</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  </div>
-)}
-      
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

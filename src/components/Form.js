@@ -263,8 +263,10 @@ const Form = () => {
 
                     <label>Status</label>
                     <select name="status" value={formData.status} onChange={handleChange}>
-                      <option value="Pass">Pass</option>
+                      <option value="Selected">Selected</option>
                       <option value="Reject">Reject</option>
+                      <option value="On Hold">On Hold</option>
+                      <option value="Waiting">Waiting</option>
                     </select>
 
                     <label>Manual Questions</label>
