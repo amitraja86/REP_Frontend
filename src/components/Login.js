@@ -144,7 +144,6 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import illustration from "./images/4630062-removebg-preview.png";
-import googleLogo from "./images/683d9a1a8150ee8b29bfd25d46804605-removebg-preview.png";
 import appzlogicLogo from "./images/images-2-removebg-preview 1.png";
 import "./styles/Login.css"; // Import your CSS file
 
@@ -153,11 +152,14 @@ const Login = () => {
   const [password, setPassword] = useState("");
   // const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true); // Start loading
+    
 
     try {
       const response = await axios.get(
@@ -170,6 +172,8 @@ const Login = () => {
     } catch (err) {
       console.error("Login failed:", err);
       setError("Invalid username or password");
+    } finally{
+      setLoading(false); // Stop loading
     }
   };
 
@@ -179,7 +183,6 @@ const Login = () => {
       <div className="login-left">
         <img src={appzlogicLogo} alt="Appzlogic Logo" className="appzlogic-logo" />
         <h1>WELCOME TO RECRUITMENT INTELLIGENCE</h1>
-        <h4>Accelerate your chances to get hired !!!</h4>
         <img src={illustration} alt="3D Illustration" className="illustration" />
       </div>
 
@@ -211,25 +214,19 @@ const Login = () => {
             />
             {/* <button type="button" onClick={() => setShowPassword(!showPassword)}>👁️</button> */}
           </div>
-          <div className="checkbox-group">
-            <span></span> {/* Placeholder if needed */}
-            <a href="/forgot-password">Forgot Password?</a>
-          </div>
+
 
           <button type="submit" className="btn-submit">Sign in</button>
         </form>
 
-        <p>or login with</p>
-        <button className="btn-google">
-          <img src={googleLogo} alt="Google Logo" className="google-icon" />
-          Sign up with Google
-        </button>
-
-        <p>
-          Don’t have an account?{" "}
-          <a href="/signup" className="signup-link">Sign Up now</a>
-        </p>
       </div>
+      {loading && (
+  <div className="login-loader-wrapper">
+    <div className="login-spinner" />
+    <span className="login-loading-text">Please wait, signing you in...</span>
+  </div>
+)}
+
     </div>
   );
 };

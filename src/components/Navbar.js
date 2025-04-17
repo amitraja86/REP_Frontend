@@ -7,12 +7,15 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Clear any authentication tokens if stored
-    localStorage.removeItem("token");
-    sessionStorage.removeItem("token");
-    
-    // Navigate back to login page
-    navigate("/");
+    const confirmLogout = window.confirm("Are you sure you want to logout?");
+    if (confirmLogout){
+      localStorage.removeItem("token"); // Remove the token from local storage
+      localStorage.removeItem("userId"); // Remove the userId from local storage
+      navigate("/"); // Redirect to the login page
+      return; // If user confirms, proceed with logout
+
+    } // If user cancels, do nothing
+
   };
 
   return (

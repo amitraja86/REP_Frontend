@@ -82,14 +82,16 @@
 
 .home-container {
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
+  display: flex; /* Added to apply flex properties */
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start; /* Keep navbar and content at the top */
   background-image: url("../images/fluent_web_light.png"); 
   background-size: cover;
   background-position: center;
-  
+  position: relative; /* Important: allows children like loading overlay to position properly */
+  overflow-x: hidden;
 }
 
 .content {
@@ -99,7 +101,10 @@
   align-items: center;
   gap: 10px;
   margin-top: 10px;
+  position: relative; /* Ensures overlays inside this can be placed correctly */
+  z-index: 1;
 }
+
 
 button {
   padding: 12px 24px;
@@ -109,23 +114,31 @@ button {
   cursor: pointer;
 }
 
+.welcome-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 40px;
+  margin-top: 40px;
+  flex-wrap: wrap; /* Stack on smaller screens */
+}
+
+/* Keep existing welcome-text styles */
 .welcome-text {
+  flex: 1;
   font-size: 16px;
   font-weight: bold;
   color: #2b435b;
-  line-height: 1.8; 
-  /* transition: background-color 0.3s ease; */
-  background: rgba(255, 255, 255, 0.5); padding: 10px 24px;
-  width: 100%;
-  margin-left: 120px;
-  /* background-size: contain; */
-  backdrop-filter:  blur(5px);
-  background-repeat: no-repeat;
-  background-position: right ;
+  /* line-height: 1.8; */
+  background: rgba(255, 255, 255, 0.5);
+  padding: 10px 24px;
+  backdrop-filter: blur(5px);
+  min-width: 300px;
 }
 
+
 .welcome-text h1 {
-  font-size: 30px;
+  font-size: 28px;
   font-weight: bold;
   color: #2b435b;
   margin-bottom: 20px;
@@ -133,7 +146,7 @@ button {
 }
 
 .welcome-text h3 {
-  font-size: 25px;
+  font-size: 20px;
   font-weight: bold;
   color: #2b435b;
   margin-bottom: 20px;
@@ -149,3 +162,42 @@ button {
   /* transition: background-color 0.3s ease; */
   /* background: rgba(255, 255, 255, 0.9); */
 }
+
+
+
+
+.loading-screen-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.85);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(0, 123, 255, 0.3);
+  border-top: 5px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-text {
+  margin-top: 16px;
+  font-size: 18px;
+  color: #333;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+

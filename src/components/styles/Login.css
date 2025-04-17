@@ -48,15 +48,6 @@
   position: relative;
 }
 
-.login-left h4 {
-  font-size: 16px;
-  text-align: center;
-  color: gray;
-  z-index: 3;
-  margin-top: 0px;
-  position: relative;
-}
-
 /* Right Section */
 .login-right  {
   flex: 1;
@@ -88,10 +79,12 @@
 }
 
 label {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: bold;
+  font-family: 'Times New Roman', Times, serif;
   color: gray;
   margin-bottom: 5px;
+  
 }
 
 input {
@@ -99,9 +92,13 @@ input {
   padding: 12px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  font-size: 14px;
+  font-size: 13px;
   background: #f4f4f4;
   outline: none;
+  /* font-size: 16px; */
+  font-family: 'Times New Roman', Times, serif;
+  /* font-style:oblique; */
+  margin-bottom: 10px;
 }
 
 input:focus {
@@ -110,8 +107,7 @@ input:focus {
 }
 
 /* Buttons */
-.btn-submit,
-.btn-google {
+.btn-submit{
   padding: 12px;
   border-radius: 5px;
   cursor: pointer;
@@ -131,49 +127,46 @@ input:focus {
   background-color: #3a76d3;
 }
 
-.btn-google {
+/* Login loading spinner styles */
+.login-loader-wrapper {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #ffffff;
-  color: black;
-  border: 1px solid #ccc;
+  height: 100vh;
+  background-color: #ffffff;
+  z-index: 9999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
 }
 
-.btn-google:hover {
-  background: #f1f1f1;
+.login-spinner {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #3498db;
+  border-top: 5px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
 }
 
-.google-icon {
-  width: 20px;
-  height: 20px;
-  margin-right: 10px;
+.login-loading-text {
+  font-size: 18px;
+  color: #3498db;
+  font-weight: 500;
+  animation: pulse 1.5s ease-in-out infinite;
 }
 
-/* Signup and Checkbox */
-.signup-link {
-  color: #ff6600;
-  font-weight: bold;
-  text-decoration: none;
+/* Spinner animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-.signup-link:hover {
-  text-decoration: underline;
-}
-
-.checkbox-group {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 14px;
-  margin-top: 10px;
-}
-
-.checkbox-group a {
-  color: #1e72c5;
-  text-decoration: none;
-}
-
-.checkbox-group a:hover {
-  text-decoration: underline;
+/* Pulsing text animation */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
 }

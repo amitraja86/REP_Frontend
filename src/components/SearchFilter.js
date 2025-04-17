@@ -419,48 +419,42 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { FaSearch } from "react-icons/fa";
+import { AiOutlineClose } from "react-icons/ai";
 import axios from "axios";
 import "./styles/SearchFilter.css";
-import filterIcon from "../components/images/filter.png";
 
 const SearchFilter = () => {
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [showResults, setShowResults] = useState(false);
-  const dropdownRef = useRef(null);
-
+  // const [showResults, setShowResults] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState({
     position: "",
     client: "",
     panel: "",
   });
 
-  const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [copiedRow, setCopiedRow] = useState(null);
+  // const [copiedRow, setCopiedRow] = useState(null);
+  const [showNoDataPopup, setShowNoDataPopup] = useState(false);
 
   const [positions, setPositions] = useState([]);
   const [clients, setClients] = useState([]);
   const [panels, setPanels] = useState([]);
-  const [filteredSuggestions, setFilteredSuggestions] = useState([]);
 
-  const [subDropdowns, setSubDropdowns] = useState({
-    position: false,
-    client: false,
-    panel: false,
-  });
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     const fetchFilters = async () => {
       try {
-        const positionResponse = await axios.get("https://recruitment-intelligence.appzlogic.in/api/positions/");
-        const clientResponse = await axios.get("https://recruitment-intelligence.appzlogic.in/api/company/");
-        const panelResponse = await axios.get("https://recruitment-intelligence.appzlogic.in/api/panels/");
+        const [positionRes, clientRes, panelRes] = await Promise.all([
+          axios.get("https://recruitment-intelligence.appzlogic.in/api/positions/"),
+          axios.get("https://recruitment-intelligence.appzlogic.in/api/company/"),
+          axios.get("https://recruitment-intelligence.appzlogic.in/api/panels/"),
+        ]);
 
-        setPositions(positionResponse.data);
-        setClients(clientResponse.data);
-        setPanels(panelResponse.data);
+        setPositions(positionRes.data);
+        setClients(clientRes.data);
+        setPanels(panelRes.data);
       } catch (error) {
         console.error("Error fetching filter data:", error);
       }
@@ -469,23 +463,10 @@ const SearchFilter = () => {
     fetchFilters();
   }, []);
 
-  const toggleDropdown = () => setShowDropdown(!showDropdown);
-
-  const toggleSubDropdown = (filter) => {
-    setSubDropdowns((prev) => ({
-      position: false,
-      client: false,
-      panel: false,
-      [filter]: !prev[filter],
-    }));
-  };
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setSubDropdowns({ position: false, client: false, panel: false });
-        setShowDropdown(false);
-        setFilteredSuggestions([]);
+        // Optional: Close dropdown or clear filter on outside click
       }
     };
 
@@ -495,102 +476,54 @@ const SearchFilter = () => {
 
   const handleSelectFilter = (filter, value) => {
     setSelectedFilters((prev) => ({ ...prev, [filter]: value }));
-    const updatedSearchTerm = [
-      filter === "position" ? value : selectedFilters.position,
-      filter === "client" ? value : selectedFilters.client,
-      filter === "panel" ? value : selectedFilters.panel,
-    ]
-      .filter(Boolean)
-      .join(", ");
-    setSearchTerm(updatedSearchTerm);
-    setSubDropdowns((prev) => ({ ...prev, [filter]: false }));
-  };
+  }; 
 
-  const handleSearchTermChange = (e) => {
-    const inputValue = e.target.value;
-    setSearchTerm(inputValue);
+  // const handleDownload = (rowData) => {
+  //   const filename = `Candidate_${rowData.Candidate_name.replace(/\s/g, "_")}.csv`;
+  //   const headers = [
+  //     "Candidate Name", "Client", "End Client", "Position",
+  //     "Interview Panel", "Round", "Date", "Questions",
+  //   ];
 
-    if (!inputValue.trim()) {
-      setFilteredSuggestions([]);
-      return;
-    }
+  //   const formattedPanel = String(rowData.Interview_Panel)
+  //     .split(",")
+  //     .map((line, i) => `${i + 1}. ${line}`)
+  //     .join(" ");
 
-    const matchedPositions = positions.filter((pos) =>
-      pos.toLowerCase().includes(inputValue.toLowerCase())
-    );
-    const matchedClients = clients.filter((client) =>
-      client.toLowerCase().includes(inputValue.toLowerCase())
-    );
-    const matchedPanels = panels.filter((panel) =>
-      panel.toLowerCase().includes(inputValue.toLowerCase())
-    );
+  //   const formattedQuestions = rowData.question
+  //     .split("\n")
+  //     .map((line, i) => `${i + 1}. ${line}`)
+  //     .join("; ");
 
-    setFilteredSuggestions([
-      ...matchedPositions.map((pos) => ({ type: "position", value: pos })),
-      ...matchedClients.map((client) => ({ type: "client", value: client })),
-      ...matchedPanels.map((panel) => ({ type: "panel", value: panel })),
-    ]);
-  };
+  //   const values = [
+  //     rowData.Candidate_name,
+  //     rowData.L1_Client,
+  //     rowData.End_Client,
+  //     rowData.Positions,
+  //     formattedPanel,
+  //     rowData.Round,
+  //     rowData.Interview_starttime,
+  //     formattedQuestions,
+  //   ];
 
-  const handleSelectSuggestion = (suggestion) => {
-    handleSelectFilter(suggestion.type, suggestion.value);
-    setSearchTerm(suggestion.value);
-    setFilteredSuggestions([]);
-  };
+  //   const csvData = [headers, values].map((row) => row.join(",")).join("\n");
+  //   const blob = new Blob([csvData], { type: "text/csv" });
 
-  const handleDownload = (rowData) => {
-    const filename = `Candidate_${rowData.Candidate_name.replace(/\s/g, "_")}.csv`;
-    const headers = [
-      "Candidate Name",
-      "Client",
-      "End Client",
-      "Position",
-      "Interview Panel",
-      "Date",
-      "Questions"
-    ];
-
-    const formattedPanel = String(rowData.Interview_Panel)
-      .split(",")
-      .map((line, i) => `${i + 1}. ${line}`)
-      .join(" ");
-
-    const formattedQuestions = rowData.question
-      .split("\n")
-      .map((line, i) => `${i + 1}. ${line}`)
-      .join("; ");
-
-    const values = [
-      rowData.Candidate_name,
-      rowData.L1_Client,
-      rowData.End_Client,
-      rowData.Positions,
-      formattedPanel,
-      rowData.Interview_starttime,
-      formattedQuestions
-    ];
-
-    const csvData = [headers, values].map((row) => row.join(",")).join("\n");
-
-    const blob = new Blob([csvData], { type: "text/csv" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+  //   const link = document.createElement("a");
+  //   link.href = URL.createObjectURL(blob);
+  //   link.download = filename;
+  //   document.body.appendChild(link);
+  //   link.click();
+  //   document.body.removeChild(link);
+  // };
 
   const handleSearch = async () => {
     if (!selectedFilters.position && !selectedFilters.client && !selectedFilters.panel) {
-      alert("Please select at least one filter or enter a search term!");
+      alert("Please select at least one filter!");
       return;
     }
 
     setLoading(true);
-    setShowDropdown(false);
-    setSubDropdowns({ position: false, client: false, panel: false });
-    setFilteredSuggestions([]);
     setError("");
     setSearchResults([]);
 
@@ -602,19 +535,23 @@ const SearchFilter = () => {
 
       const token = localStorage.getItem("token");
 
-      const response = await axios.get(`https://recruitment-intelligence.appzlogic.in/api/question/?${params.toString()}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-          token: token,
-        },
-      });
+      const response = await axios.get(
+        `https://recruitment-intelligence.appzlogic.in/api/question/?${params.toString()}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+            token: token,
+          },
+        }
+      );
 
       if (response.data.details.length === 0) {
+        setShowNoDataPopup(true);
         setError("No results found.");
       } else {
-        setSearchResults(response.data.details);
-        setShowResults(true);
+        localStorage.setItem("searchResults", JSON.stringify(response.data.details));
+        window.open("/search-results", "_blank");
       }
     } catch (error) {
       console.error("Search error:", error.response?.data || error.message);
@@ -627,73 +564,117 @@ const SearchFilter = () => {
   return (
     <div ref={dropdownRef} className="search">
       <div className="search-bar">
-        <button className="filter-btn" onClick={toggleDropdown}>
-          <img src={filterIcon} alt="Filter" className="filter-icon" />
-        </button>
+        <div className="filter-tabs">
 
-        <input
-          type="text"
-          className="search-box"
-          placeholder="Search..."
-          value={searchTerm}
-          onChange={handleSearchTermChange}
-        />
-        {searchTerm && (
-          <button className="clear-btn" onClick={() => {
-            setSearchTerm("");
-            setSelectedFilters({ position: "", client: "", panel: "" });
-            setSearchResults([]);
-            setFilteredSuggestions([]);
-            setShowResults(false);
-            setError("");
-          }}>X</button>
-        )}
-        <button className="search-btn" onClick={handleSearch}>
-          <FaSearch />
-        </button>
+          {/* Position Filter */}
+          <div className="filter-group">
+            <label>Position</label>
+            <div className="select-wrapper">
+              <select
+                value={selectedFilters.position}
+                onChange={(e) => handleSelectFilter("position", e.target.value)}
+              >
+                <option value="">Select</option>
+                {positions.map((pos) => (
+                  <option key={pos} value={pos}>{pos}</option>
+                ))}
+              </select>
+              {selectedFilters.position && (
+                <button
+                  className="clear-btn"
+                  onClick={() => handleSelectFilter("position", "")}
+                  title="Clear Position"
+                >
+                  <AiOutlineClose />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Client Filter */}
+          <div className="filter-group">
+            <label>Client</label>
+            <div className="select-wrapper">
+              <select
+                value={selectedFilters.client}
+                onChange={(e) => handleSelectFilter("client", e.target.value)}
+              >
+                <option value="">Select</option>
+                {clients.map((client) => (
+                  <option key={client} value={client}>{client}</option>
+                ))}
+              </select>
+              {selectedFilters.client && (
+                <button
+                  className="clear-btn"
+                  onClick={() => handleSelectFilter("client", "")}
+                  title="Clear Client"
+                >
+                  <AiOutlineClose />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Panel Filter */}
+          <div className="filter-group">
+            <label>Panel</label>
+            <div className="select-wrapper">
+              <select
+                value={selectedFilters.panel}
+                onChange={(e) => handleSelectFilter("panel", e.target.value)}
+              >
+                <option value="">Select </option>
+                {panels.map((panel) => (
+                  <option key={panel} value={panel}>{panel}</option>
+                ))}
+              </select>
+              {selectedFilters.panel && (
+                <button
+                  className="clear-btn"
+                  onClick={() => handleSelectFilter("panel", "")}
+                  title="Clear Panel"
+                >
+                  <AiOutlineClose />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Clear All Filters */}
+          <button
+            className="clear-all-btn"
+            onClick={() => setSelectedFilters({ position: "", client: "", panel: "" })}
+            title="Clear All Filters"
+          >
+            <AiOutlineClose style={{ marginRight: "4px" }} />
+          </button>
+
+          {/* Search Button */}
+          <button className="search-btn" onClick={handleSearch}>
+            <FaSearch />
+          </button>
+
+        </div>
       </div>
 
-      {filteredSuggestions.length > 0 && (
-        <ul className="search-suggestions">
-          {filteredSuggestions.map((suggestion, index) => (
-            <li key={index} onClick={() => handleSelectSuggestion(suggestion)}>
-              <span className="suggestion-type">[{suggestion.type}]</span> {suggestion.value}
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {showDropdown && (
-        <div className="filter-dropdown">
-          <ul>
-            {["position", "client", "panel"].map((filter) => (
-              <li key={filter} onClick={() => toggleSubDropdown(filter)}>
-                {filter.charAt(0).toUpperCase() + filter.slice(1)}
-                {subDropdowns[filter] && (
-                  <ul className="sub-dropdown">
-                    {(filter === "position" ? positions :
-                      filter === "client" ? clients : panels
-                    ).map((item) => (
-                      <li key={item} onClick={() => handleSelectFilter(filter, item)}>
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </li>
-            ))}
-          </ul>
+      {showNoDataPopup && (
+        <div className="popup-overlay">
+          <div className="popup-box">
+            <p>No data found!</p>
+            <button className="popup-close-btn" onClick={() => setShowNoDataPopup(false)}>Close</button>
+          </div>
         </div>
       )}
 
       {loading && (
         <div className="loading-spinner-container">
-          <div className="spinner"></div>
-            <span className="loading-text">Loading...</span>
+          <div className="spinner" />
+          <span className="loading-text">Loading...</span>
         </div>
       )}
 
-      {showResults && (
+      {/* {showResults && (
         <div className="overlay">
           <div className="results-modal">
             <button className="close-modal-btn" onClick={() => setShowResults(false)}>×</button>
@@ -706,6 +687,7 @@ const SearchFilter = () => {
                     <th>End Client</th>
                     <th>Position</th>
                     <th>Interview Panel</th>
+                    <th>Round</th>
                     <th>Date</th>
                     <th>Questions</th>
                     <th>Download</th>
@@ -719,29 +701,38 @@ const SearchFilter = () => {
                       <td>{result.End_Client}</td>
                       <td>{result.Positions}</td>
                       <td>
-                        <ol>{String(result.Interview_Panel).split(",").map((line, i) => <li key={i}>{line}</li>)}</ol>
+                        <ol>
+                          {String(result.Interview_Panel).split(",").map((line, i) => (
+                            <li key={i}>{line}</li>
+                          ))}
+                        </ol>
                       </td>
+                      <td>{result.Round}</td>
                       <td>{result.Interview_starttime}</td>
                       <td className="question-cell">
-                          <div className="question-scroll">
-                              <ol className="question-list">
-                                 {result.question.split("\n").map((line, i) => (
-                                 <li key={i}>{line}</li>
-                                 ))}
-                             </ol>
-                          </div>
-                         <button className="copy-btn" onClick={() => {
-                                 navigator.clipboard.writeText(result.question);
-                                 setCopiedRow(index);
-                                 setTimeout(() => setCopiedRow(null), 2000); // Reset 
-                                }}
-                                 title="Copy All Questions"
-                        >📋 </button>
-                        {copiedRow === index && (
-                             <span className="copied-text">Copied!</span>
-                        )}
+                        <div className="question-scroll">
+                          <ol className="question-list">
+                            {result.question.split("\n").map((line, i) => (
+                              <li key={i}>{line}</li>
+                            ))}
+                          </ol>
+                        </div>
+                        <button
+                          className="copy-btn"
+                          onClick={() => {
+                            navigator.clipboard.writeText(result.question);
+                            setCopiedRow(index);
+                            setTimeout(() => setCopiedRow(null), 2000);
+                          }}
+                          title="Copy All Questions"
+                        >
+                          📋
+                        </button>
+                        {copiedRow === index && <span className="copied-text">Copied!</span>}
                       </td>
-                      <td><button onClick={() => handleDownload(result)}>Download</button></td>
+                      <td>
+                        <button onClick={() => handleDownload(result)}>Download</button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -749,7 +740,7 @@ const SearchFilter = () => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

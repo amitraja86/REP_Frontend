@@ -68,10 +68,10 @@
 import React, { useState } from "react";
 import "../components/styles/Form.css";
 
-const Form = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectionOpen, setSelectionOpen] = useState(false);
-  const [inputType, setInputType] = useState(""); // 'manual' or 'csv'
+const Form = ({ inputTypeFromProps }) => {
+  const [isOpen, setIsOpen] = useState(inputTypeFromProps === "manual");
+  // const [selectionOpen, setSelectionOpen] = useState(false);
+  const [inputType, setInputType] = useState(inputTypeFromProps || ""); // 'manual' or 'csv'
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -105,17 +105,17 @@ const Form = () => {
   };
 
   // Open selection popup
-  const handleOpenSelection = () => {
-    setSelectionOpen(true);
-    setIsOpen(false);
-    resetForm();
-  };
+  // const handleOpenSelection = () => {
+  //   setSelectionOpen(true);
+  //   setIsOpen(false);
+  //   resetForm();
+  // };
 
   // Handles input change
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
-  };
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFormData((prevData) => ({ ...prevData, [name]: value }));
+  // };
 
   // Handles file upload
   const handleFileChange = (e) => {
@@ -130,7 +130,7 @@ const Form = () => {
         }));
       };
     } else {
-      alert("Please upload a valid CSV file.");
+      alert("Please use a proper CSV template!!!");
     }
   };
 
@@ -208,101 +208,69 @@ const Form = () => {
 
   return (
     <>
-      <button onClick={handleOpenSelection} className="open-form-button">
-        ADD DETAILS
-      </button>
+     <div className="details-card">
+        <h3 className="card-title">Add Questions</h3>
+        <p className="card-description">
+          Please add Interview questions here.
+         <br /> You can either enter the details manually or upload a CSV file.
+        </p>
+          
+        <div className="button-group">
+          <button onClick={() => window.open("/manual-form", "_blank")} className="open-form-button" >
+            Enter Manually
+          </button>
 
-      {selectionOpen && (
-        <div className="modal-overlays">
-          <div className="modal-contents">
-            <span className="close-button" onClick={() => setSelectionOpen(false)}>
-              &times;
-            </span>
-            <h2>Select Input Method</h2>
-            <button onClick={() => { setInputType("manual"); setSelectionOpen(false); setIsOpen(true); }}>
-              Enter Manually
-            </button>
-            <button onClick={() => { setInputType("csv"); setSelectionOpen(false); setIsOpen(true); }}>
-              Upload CSV File
-            </button>
-          </div>
+          <button className="selection-button"
+              onClick={() => {
+              setInputType("csv");
+              // setSelectionOpen(false);
+              setIsOpen(true);
+            }}>
+                Upload CSV File
+          </button>
         </div>
-      )}
+      </div>
 
       {isOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <span className="close-button" onClick={() => setIsOpen(false)}>
-              &times;
-            </span>
-            <h2>{inputType === "manual" ? "Add Interview Questions" : "Upload CSV File"}</h2>
-            <form className="data-form" onSubmit={handleSubmit}>
-              {inputType === "manual" && (
-                <>
-                  <div className="form-group">
-                    <label>Candidate Name</label>
-                    <input type="text" name="candidateName" value={formData.candidateName} onChange={handleChange} required />
-
-                    <label>Client</label>
-                    <input type="text" name="endClient" value={formData.endClient} onChange={handleChange} required />
-
-                    <label>Position</label>
-                    <input type="text" name="position" value={formData.position} onChange={handleChange} required />
-
-                    <label>Country/City</label>
-                    <input type="text" name="location" value={formData.location} onChange={handleChange} />
-
-                    <label>Panel</label>
-                    <input type="text" name="panel" value={formData.panel} onChange={handleChange} required />
-
-                    <label>Date</label>
-                    <input type="datetime-local" name="dateTime" value={formData.dateTime} onChange={handleChange} />
-
-                    <label>Round</label>
-                    <input type="number" name="round" value={formData.round} onChange={handleChange} />
-
-                    <label>Status</label>
-                    <select name="status" value={formData.status} onChange={handleChange}>
-                      <option value="Selected">Selected</option>
-                      <option value="Reject">Reject</option>
-                      <option value="On Hold">On Hold</option>
-                      <option value="Waiting">Waiting</option>
-                    </select>
-
-                    <label>Manual Questions</label>
-                    <textarea name="manualQuestions" value={formData.manualQuestions} onChange={handleChange} placeholder="Enter questions manually..."></textarea>
-                  </div>
-                </>
-              )}
-
-              {inputType === "csv" && (
-                <>
-                  <div className="form-group">
+          <div className="form-modal-overlay">
+            <div className="form-modal-content">
+              <span className="form-close-button" onClick={() => setIsOpen(false)}>
+                &times;
+              </span>
+              <h2 className="form-modal-title">
+                {inputType === "manual" ? "Add Interview Questions" : "Upload CSV File"}
+              </h2>
+              <form className="interview-form" onSubmit={handleSubmit}>
+                {inputType === "csv" && (
+                  <div className="form-section">
                     <label>Upload CSV File</label>
                     <input type="file" name="questionSet" accept=".csv" onChange={handleFileChange} required />
+                    <div className="template-download">
+                      <a href="/templates/recruitment_questions_template.csv"
+                        download="Recruitment_Questions_Template.csv"
+                        className="template-link"
+                      >
+                        Download CSV Template
+                      </a>
+                    </div>
                   </div>
-                </>
-              )}
-
-              <div className="form-actions">
-                <button type="button" className="cancel-button" onClick={() => setIsOpen(false)}>
-                  Cancel
-                </button>
-                <button type="submit" className="submit-button">Submit</button>
-              </div>
-            </form>
+                )}
+                <div className="form-actions">
+                  <button type="button" className="form-cancel-button" 
+                  onClick={() => setIsOpen(false)}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="form-submit-button">Submit</button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+
 
       {showSuccessPopup && (
-        <div className="success-popup-overlay">
-          <div className="success-popup">
-            <span className="close-button" onClick={() => setShowSuccessPopup(false)}>
-              &times;
-            </span>
-            <p>Data added successfully!</p>
-          </div>
+        <div className="success-popup">
+          <p>Form submitted successfully!</p>
         </div>
       )}
     </>
