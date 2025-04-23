@@ -8,8 +8,7 @@ import ManualFormPage from "./components/ManualFormPage";
 import { Route, Routes } from "react-router-dom";
 import Login from "./components/Login";
 import Home from "./components/Home";
-import Reports from "./components/Reports";
-// import FrontPage from "./components/FrontPage";
+
 
 
 function App() {
@@ -31,7 +30,7 @@ function App() {
         <Route path="/search-results" element={<SearchResultsPage/>} />
         <Route path="/form" element={<Form/>} />
         <Route path="/manual-form" element={<ManualFormPage/>} />
-        <Route path="/reports" element={<Reports/>} />
+       
         
       </Routes>  
     </>
