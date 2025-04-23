@@ -25,8 +25,8 @@ const Navbar = () => {
         <span className="navbar-title">Recruitment Intelligence Platform</span>
       </div>
       <div className="nav-links">
-        <li onClick={() => navigate("/Home")}>Home</li>
-        <li onClick={() => navigate("/Reports")}>Reports</li>
+        {/* <li onClick={() => navigate("/Home")}>Home</li>
+        <li onClick={() => navigate("/Reports")}>Reports</li> */}
         <li className="logout-button" onClick={handleLogout}>Logout</li>
       </div>
     </div>

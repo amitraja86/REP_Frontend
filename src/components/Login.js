@@ -150,7 +150,7 @@ import "./styles/Login.css"; // Import your CSS file
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -159,8 +159,7 @@ const Login = () => {
     e.preventDefault();
     setError("");
     setLoading(true); // Start loading
-    
-
+  
     try {
       const response = await axios.get(
         `https://recruitment-intelligence.appzlogic.in/api/user/login/?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
@@ -172,11 +171,12 @@ const Login = () => {
     } catch (err) {
       console.error("Login failed:", err);
       setError("Invalid username or password");
-    } finally{
+      window.alert("Invalid username or password"); // 👈 Show popup alert
+    } finally {
       setLoading(false); // Stop loading
     }
   };
-
+  
   return (
     <div className="login-container">
       {/* Left Panel */}
@@ -189,7 +189,7 @@ const Login = () => {
       {/* Right Panel */}
       <div className="login-right">
         <h2>SIGN IN </h2>
-        {error && <p className="error-message">{error}</p>} {/* Show error message */}
+        {/* {error && <p className="error-message">{error}</p>} Show error message */}
         
         <form onSubmit={handleLogin} className="input-container">
           <label htmlFor="email">Username</label>
@@ -205,14 +205,15 @@ const Login = () => {
           <label htmlFor="password">Password</label>
           <div className="password-container">
             <input 
-              // type={showPassword ? "text" : "password"} 
+              type={showPassword ? "text" : "password"} 
               id="password" 
               placeholder="Enter password" 
               value={password} 
               onChange={(e) => setPassword(e.target.value)} 
               required 
             />
-            {/* <button type="button" onClick={() => setShowPassword(!showPassword)}>👁️</button> */}
+            {/* <button type="button" onClick={() => setShowPass
+            word(!showPassword)}>👁️</button> */}
           </div>
 
 
@@ -220,12 +221,12 @@ const Login = () => {
         </form>
 
       </div>
-      {loading && (
+      {/* {loading && (
   <div className="login-loader-wrapper">
     <div className="login-spinner" />
     <span className="login-loading-text">Please wait, signing you in...</span>
   </div>
-)}
+)} */}
 
     </div>
   );
