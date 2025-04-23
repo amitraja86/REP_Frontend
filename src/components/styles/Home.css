@@ -74,98 +74,89 @@
 } */
 
 
+/* Global Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  transition: all 0.3s ease; /* Smooth transitions for hover and changes */
 }
 
+/* Home Container */
 .home-container {
-  width: 100vw;
-  min-height: 100vh;
-  display: flex; /* Added to apply flex properties */
+  display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: flex-start; /* Keep navbar and content at the top */
-  background-image: url("../images/fluent_web_light.png"); 
+  min-height: 100vh;
+  width: 100vw;
+  position: relative;
+  background-image: url("../images/fluent_web_light.png"); /* Restored previous background image */
   background-size: cover;
   background-position: center;
-  position: relative; /* Important: allows children like loading overlay to position properly */
   overflow-x: hidden;
 }
 
-.content {
-  width: 90%;
+/* Main Content (Sidebar + Content) */
+.main-content {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  margin-top: 10px;
-  position: relative; /* Ensures overlays inside this can be placed correctly */
-  z-index: 1;
-}
-
-
-button {
-  padding: 12px 24px;
-  border: none;
-  border-radius: 5px;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-.welcome-wrapper {
-  display: flex;
+  width: 100%;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 40px;
-  margin-top: 40px;
-  flex-wrap: wrap; /* Stack on smaller screens */
+  padding: 20px;
+  gap: 20px;
+  flex-wrap: wrap; /* For responsiveness */
+  height: 70vh; /* Ensure the main content takes up the full height of the viewport */
 }
 
-/* Keep existing welcome-text styles */
-.welcome-text {
+/* Sidebar */
+.sidebar {
+  width: 200px;
+  background: linear-gradient(to right, #f8f9fa, #0066d23a);
+  padding: 20px;
+  height: 84vh; /* Full height of the page */
+  position: sticky;
+  top: 10px; /* Sticks to the top of the viewport */
+  border-right: 2px solid #ddd;
+  transition: background-color 0.3s ease;
+}
+
+.sidebar:hover {
+  background-color: #eaeaea;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar ul li {
+  margin: 20px 0;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 17px;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.sidebar ul li:hover {
+  color: #007bff;
+  transform: scale(1.05);
+}
+
+
+/* Content */
+.content {
   flex: 1;
-  font-size: 16px;
-  font-weight: bold;
-  color: #2b435b;
-  /* line-height: 1.8; */
-  background: rgba(255, 255, 255, 0.5);
-  padding: 10px 24px;
-  backdrop-filter: blur(5px);
-  min-width: 300px;
+  /* background-color: #fff; */
+  /* border-radius: 8px; */
+  /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
+  padding: 20px;
+  /* transition: box-shadow 0.3s ease, transform 0.3s ease; */
 }
 
+/* .content:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+} */
 
-.welcome-text h1 {
-  font-size: 28px;
-  font-weight: bold;
-  color: #2b435b;
-  margin-bottom: 20px;
-  /* text-align: center; */
-}
-
-.welcome-text h3 {
-  font-size: 20px;
-  font-weight: bold;
-  color: #2b435b;
-  margin-bottom: 20px;
-  /* text-align: center; */
-}
-
-.line{
-  font-size: 14px;
-  color: #2b435b;
-  margin-bottom: 60px;
-  text-align: left;
-  /* padding: 20px 10px; */
-  /* transition: background-color 0.3s ease; */
-  /* background: rgba(255, 255, 255, 0.9); */
-}
-
-
-
-
+/* Loading Screen Overlay */
 .loading-screen-overlay {
   position: fixed;
   top: 0;
@@ -195,9 +186,31 @@ button {
   color: #333;
 }
 
+/* Keyframe for Spin Animation */
 @keyframes spin {
   to {
     transform: rotate(360deg);
   }
 }
 
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .main-content {
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .sidebar {
+    width: 100%;
+    padding: 15px;
+    border-right: none;
+    height: auto;
+    position: relative;
+  }
+
+  .content {
+    width: 100%;
+    padding: 15px;
+  }
+}

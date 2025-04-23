@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 // import "../components/styles/Form.css";
-import "../components/styles/ManualFormPage.css"; // Import your CSS file for styling
+import "../styles/ManualFormPage.css"; // Import your CSS file for styling
 
 const ManualForm = () => {
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
@@ -97,7 +97,7 @@ const ManualForm = () => {
 
     try {
       const response = await fetch(
-        "https://recruitment-intelligence.appzlogic.in/api/add_questions/",
+        "http://127.0.0.1:8000/api/v2/add_questions/",
         {
           method: "POST",
           headers: {
@@ -156,7 +156,14 @@ const ManualForm = () => {
             <div className="form-label">Panel
             <span className="required-asterisk">*</span>
             </div>
-            <input type="text" name="panel" value={formData.panel} onChange={handleChange} required />
+            <input
+              type="text"
+              name="panel"
+              value={formData.panel}
+              onChange={handleChange}
+              required
+              placeholder="Separate names by , and do not use any other symbol"
+            />
           </div>
   
           <div className="form-group">
@@ -194,26 +201,7 @@ const ManualForm = () => {
           </div>
         </div>
   
-        {/* <div className="form-actions">
-          <button type="submit" className="form-submit-button">Submit</button>
-        </div>
-      </form>
-    </div>
-  ); */}
-   
-  
-
         <div className="form-actions">
-        {/* <label htmlFor="csv-upload" className="form-submit-button" style={{ cursor: "pointer", marginBottom: "1rem" }}>
-    Upload CSV to Fill Form
-  </label>
-  <input
-    id="csv-upload"
-    type="file"
-    accept=".csv"
-    onChange={handleCSVUpload}
-    style={{ display: "none" }}
-  /> */}
           <button type="submit" className="form-submit-button">Submit</button>
         </div>
       </form>

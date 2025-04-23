@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FiDownload } from "react-icons/fi"; // <-- Import Download Icon
-import "./styles/SearchResultsPage.css"; // Ensure the path is correct
+import "../styles/SearchResultsPage.css"; // Ensure the path is correct
 import { FiCopy } from "react-icons/fi"; // <-- Import Copy Icon
 // import { FiEdit } from "react-icons/fi"; // Add this import at the top of the file
 

@@ -78,7 +78,7 @@
 
 //     try {
 //       const response = await axios.get(
-//         `https://recruitment-intelligence.appzlogic.in/api/user/login/?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+//         `http://127.0.0.1:8000/api/v2/user/login/?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
 //       );
 //       console.log("Login successful:", response.data);
 //       const { access_token } = response.data;
@@ -163,7 +163,7 @@ const Login = () => {
 
     try {
       const response = await axios.get(
-        `https://recruitment-intelligence.appzlogic.in/api/user/login/?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+        `http://127.0.0.1:8000/api/v2/user/login/?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
       );
       console.log("Login successful:", response.data);
       const { access_token } = response.data;
@@ -226,6 +226,11 @@ const Login = () => {
     <span className="login-loading-text">Please wait, signing you in...</span>
   </div>
 )}
+
+
+
+    
+
 
     </div>
   );

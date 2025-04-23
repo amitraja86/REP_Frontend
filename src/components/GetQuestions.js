@@ -232,7 +232,7 @@
 
 //     try{
 //       console.log()
-//       const response = await axios.get(`https://recruitment-intelligence.appzlogic.in/api/question/?company_name=${encodeURIComponent(client)}&position=${encodeURIComponent(position)}&panel_name=${encodeURIComponent(panel)}
+//       const response = await axios.get(`http://127.0.0.1:8000/api/v2/question/?company_name=${encodeURIComponent(client)}&position=${encodeURIComponent(position)}&panel_name=${encodeURIComponent(panel)}
 // `)
 //       console.log("Search successful:", response.data);
 //       alert("Search successful!");
@@ -320,22 +320,22 @@
   
 
 //   // useEffect(() => {
-//   //   axios.get('https://recruitment-intelligence.appzlogic.in/api/positions/')
+//   //   axios.get('http://127.0.0.1:8000/api/v2/positions/')
 //   //   .then(response => setPositions(response.data))
 //   //   .catch(error => console.log(error));
   
-//   //   axios.get('https://recruitment-intelligence.appzlogic.in/api/company/')
+//   //   axios.get('http://127.0.0.1:8000/api/v2/company/')
 //   //       .then(response => setCompanies(response.data))
 //   //       .catch(error => console.log(error));
     
-//   //   axios.get('https://recruitment-intelligence.appzlogic.in/api/panel/')
+//   //   axios.get('http://127.0.0.1:8000/api/v2/panel/')
 //   //       .then(response => setPanel(response.data))
 //   //       .catch(error => console.log(error));    
 //   // }, [filters]);
   
 //   // useEffect(() => {
 //   //   const { position, company, panel } = filters;
-//   //   axios.get('https://recruitment-intelligence.appzlogic.in/api/question/', {
+//   //   axios.get('http://127.0.0.1:8000/api/v2/question/', {
 //   //     params: { position, company_name: company, panel_name: panel }
 //   //   })
 //   //   .then(response => setSearchResults(response.data.details))
@@ -361,7 +361,7 @@
 //     }
 //     try {
 //       const response = await axios.get(
-//         `https://recruitment-intelligence.appzlogic.in/api/question/?company_name=${encodeURIComponent(company)}&position=${encodeURIComponent(position)}&panel_name=${encodeURIComponent(panel)}`)
+//         `http://127.0.0.1:8000/api/v2/question/?company_name=${encodeURIComponent(company)}&position=${encodeURIComponent(position)}&panel_name=${encodeURIComponent(panel)}`)
 //       console.log("Search successful:", response.data);
 //       alert("Search successful!");
 //       } catch (error) {
@@ -424,98 +424,67 @@ import axios from "axios";
 import "./styles/SearchFilter.css";
 
 const SearchFilter = () => {
-  // const [showResults, setShowResults] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState({
     position: "",
     client: "",
     panel: "",
   });
 
-  const [searchResults, setSearchResults] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  // const [copiedRow, setCopiedRow] = useState(null);
-  const [showNoDataPopup, setShowNoDataPopup] = useState(false);
-
   const [positions, setPositions] = useState([]);
-  const [clients, setClients] = useState([]);
+  const [clients, setClients] = useState({});
   const [panels, setPanels] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [, setError] = useState("");
+  const [showNoDataPopup, setShowNoDataPopup] = useState(false);
 
   const dropdownRef = useRef(null);
 
+  // Step 1: Fetch the client data once on mount
   useEffect(() => {
-    const fetchFilters = async () => {
+    const fetchClientData = async () => {
       try {
-        const [positionRes, clientRes, panelRes] = await Promise.all([
-          axios.get("https://recruitment-intelligence.appzlogic.in/api/positions/"),
-          axios.get("https://recruitment-intelligence.appzlogic.in/api/company/"),
-          axios.get("https://recruitment-intelligence.appzlogic.in/api/panels/"),
-        ]);
-
-        setPositions(positionRes.data);
-        setClients(clientRes.data);
-        setPanels(panelRes.data);
+        const res = await axios.get("http://127.0.0.1:8000/api/v2/company/");
+        setClients(res.data); // Store the entire object with client names as keys
       } catch (error) {
-        console.error("Error fetching filter data:", error);
+        console.error("Error fetching client data:", error);
       }
     };
 
-    fetchFilters();
+    fetchClientData();
   }, []);
 
+  // Step 2: Update positions and panels based on the selected client
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        // Optional: Close dropdown or clear filter on outside click
-      }
-    };
+    const allPositions = [];
+    const allPanels = [];
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    if (selectedFilters.client && clients[selectedFilters.client]) {
+      // If a client is selected, filter positions and panels for that client
+      const data = clients[selectedFilters.client];
+      setPositions(data[0]?.[0] || []);
+      setPanels(data[1]?.[0] || []);
+    } else {
+      // If no client is selected, gather all positions and panels across clients
+      Object.values(clients).forEach((entry) => {
+        allPositions.push(...(entry[0]?.[0] || []));
+        allPanels.push(...(entry[1]?.[0] || []));
+      });
+
+      // Remove duplicates
+      const uniquePositions = [...new Set(allPositions)];
+      const uniquePanels = [...new Set(allPanels)];
+
+      setPositions(uniquePositions);
+      setPanels(uniquePanels);
+    }
+  }, [selectedFilters.client, clients]);
 
   const handleSelectFilter = (filter, value) => {
-    setSelectedFilters((prev) => ({ ...prev, [filter]: value }));
-  }; 
-
-  // const handleDownload = (rowData) => {
-  //   const filename = `Candidate_${rowData.Candidate_name.replace(/\s/g, "_")}.csv`;
-  //   const headers = [
-  //     "Candidate Name", "Client", "End Client", "Position",
-  //     "Interview Panel", "Round", "Date", "Questions",
-  //   ];
-
-  //   const formattedPanel = String(rowData.Interview_Panel)
-  //     .split(",")
-  //     .map((line, i) => `${i + 1}. ${line}`)
-  //     .join(" ");
-
-  //   const formattedQuestions = rowData.question
-  //     .split("\n")
-  //     .map((line, i) => `${i + 1}. ${line}`)
-  //     .join("; ");
-
-  //   const values = [
-  //     rowData.Candidate_name,
-  //     rowData.L1_Client,
-  //     rowData.End_Client,
-  //     rowData.Positions,
-  //     formattedPanel,
-  //     rowData.Round,
-  //     rowData.Interview_starttime,
-  //     formattedQuestions,
-  //   ];
-
-  //   const csvData = [headers, values].map((row) => row.join(",")).join("\n");
-  //   const blob = new Blob([csvData], { type: "text/csv" });
-
-  //   const link = document.createElement("a");
-  //   link.href = URL.createObjectURL(blob);
-  //   link.download = filename;
-  //   document.body.appendChild(link);
-  //   link.click();
-  //   document.body.removeChild(link);
-  // };
+    setSelectedFilters((prev) => ({
+      ...prev,
+      [filter]: value,
+    }));
+  };
 
   const handleSearch = async () => {
     if (!selectedFilters.position && !selectedFilters.client && !selectedFilters.panel) {
@@ -525,8 +494,6 @@ const SearchFilter = () => {
 
     setLoading(true);
     setError("");
-    setSearchResults([]);
-
     try {
       const params = new URLSearchParams();
       if (selectedFilters.position) params.append("position", selectedFilters.position);
@@ -536,7 +503,7 @@ const SearchFilter = () => {
       const token = localStorage.getItem("token");
 
       const response = await axios.get(
-        `https://recruitment-intelligence.appzlogic.in/api/question/?${params.toString()}`,
+        `http://127.0.0.1:8000/api/v2/question/?${params.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -565,6 +532,29 @@ const SearchFilter = () => {
     <div ref={dropdownRef} className="search">
       <div className="search-bar">
         <div className="filter-tabs">
+          {/* Client Filter (Now First) */}
+          <div className="filter-group">
+            <label>Client</label>
+            <div className="select-wrapper">
+              <select
+                value={selectedFilters.client}
+                onChange={(e) => setSelectedFilters({ ...selectedFilters, client: e.target.value })}
+              >
+                <option value="">Select a client</option>
+                {Object.keys(clients).map((clientName) => (
+                  <option key={clientName} value={clientName}>
+                    {clientName}
+                  </option>
+                ))}
+              </select>
+
+              {selectedFilters.client && (
+                <button className="clear-btn" onClick={() => handleSelectFilter("client", "")}>
+                  <AiOutlineClose />
+                </button>
+              )}
+            </div>
+          </div>
 
           {/* Position Filter */}
           <div className="filter-group">
@@ -580,36 +570,7 @@ const SearchFilter = () => {
                 ))}
               </select>
               {selectedFilters.position && (
-                <button
-                  className="clear-btn"
-                  onClick={() => handleSelectFilter("position", "")}
-                  title="Clear Position"
-                >
-                  <AiOutlineClose />
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Client Filter */}
-          <div className="filter-group">
-            <label>Client</label>
-            <div className="select-wrapper">
-              <select
-                value={selectedFilters.client}
-                onChange={(e) => handleSelectFilter("client", e.target.value)}
-              >
-                <option value="">Select</option>
-                {clients.map((client) => (
-                  <option key={client} value={client}>{client}</option>
-                ))}
-              </select>
-              {selectedFilters.client && (
-                <button
-                  className="clear-btn"
-                  onClick={() => handleSelectFilter("client", "")}
-                  title="Clear Client"
-                >
+                <button className="clear-btn" onClick={() => handleSelectFilter("position", "")}>
                   <AiOutlineClose />
                 </button>
               )}
@@ -624,28 +585,24 @@ const SearchFilter = () => {
                 value={selectedFilters.panel}
                 onChange={(e) => handleSelectFilter("panel", e.target.value)}
               >
-                <option value="">Select </option>
+                <option value="">Select</option>
                 {panels.map((panel) => (
                   <option key={panel} value={panel}>{panel}</option>
                 ))}
               </select>
               {selectedFilters.panel && (
-                <button
-                  className="clear-btn"
-                  onClick={() => handleSelectFilter("panel", "")}
-                  title="Clear Panel"
-                >
+                <button className="clear-btn" onClick={() => handleSelectFilter("panel", "")}>
                   <AiOutlineClose />
                 </button>
               )}
             </div>
           </div>
 
-          {/* Clear All Filters */}
+          {/* Clear All */}
           <button
             className="clear-all-btn"
             onClick={() => setSelectedFilters({ position: "", client: "", panel: "" })}
-            title="Clear All Filters"
+            title="Clear all filters"
           >
             <AiOutlineClose style={{ marginRight: "4px" }} />
           </button>
@@ -654,93 +611,26 @@ const SearchFilter = () => {
           <button className="search-btn" onClick={handleSearch}>
             <FaSearch />
           </button>
-
         </div>
       </div>
 
+      {/* No Data Popup */}
       {showNoDataPopup && (
         <div className="popup-overlay">
           <div className="popup-box">
             <p>No data found!</p>
-            <button className="popup-close-btn" onClick={() => setShowNoDataPopup(false)}>Close</button>
+            <button onClick={() => setShowNoDataPopup(false)}>Close</button>
           </div>
         </div>
       )}
 
+      {/* Loading Spinner */}
       {loading && (
         <div className="loading-spinner-container">
           <div className="spinner" />
           <span className="loading-text">Loading...</span>
         </div>
       )}
-
-      {/* {showResults && (
-        <div className="overlay">
-          <div className="results-modal">
-            <button className="close-modal-btn" onClick={() => setShowResults(false)}>×</button>
-            <div className="table-container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Candidate Name</th>
-                    <th>Client</th>
-                    <th>End Client</th>
-                    <th>Position</th>
-                    <th>Interview Panel</th>
-                    <th>Round</th>
-                    <th>Date</th>
-                    <th>Questions</th>
-                    <th>Download</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {searchResults.map((result, index) => (
-                    <tr key={index}>
-                      <td>{result.Candidate_name}</td>
-                      <td>{result.L1_Client}</td>
-                      <td>{result.End_Client}</td>
-                      <td>{result.Positions}</td>
-                      <td>
-                        <ol>
-                          {String(result.Interview_Panel).split(",").map((line, i) => (
-                            <li key={i}>{line}</li>
-                          ))}
-                        </ol>
-                      </td>
-                      <td>{result.Round}</td>
-                      <td>{result.Interview_starttime}</td>
-                      <td className="question-cell">
-                        <div className="question-scroll">
-                          <ol className="question-list">
-                            {result.question.split("\n").map((line, i) => (
-                              <li key={i}>{line}</li>
-                            ))}
-                          </ol>
-                        </div>
-                        <button
-                          className="copy-btn"
-                          onClick={() => {
-                            navigator.clipboard.writeText(result.question);
-                            setCopiedRow(index);
-                            setTimeout(() => setCopiedRow(null), 2000);
-                          }}
-                          title="Copy All Questions"
-                        >
-                          📋
-                        </button>
-                        {copiedRow === index && <span className="copied-text">Copied!</span>}
-                      </td>
-                      <td>
-                        <button onClick={() => handleDownload(result)}>Download</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )} */}
     </div>
   );
 };

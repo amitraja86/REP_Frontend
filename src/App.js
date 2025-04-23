@@ -1,14 +1,16 @@
 import React from "react";
 import "./App.css";
 import Navbar from "./components/Navbar";
-import SearchFilter from "./components/SearchFilter";
-import SearchResultsPage from "./components/SearchResultsPage";
-import Form from "./components/Form";
-import ManualFormPage from "./components/ManualFormPage";
+import SearchFilter from "./components/GetQuestions";
+import SearchResultsPage from "./components/pages/SearchResultsPage";
+import Form from "./components/AddQuestions";
+import ManualFormPage from "./components/pages/ManualFormPage";
 import { Route, Routes } from "react-router-dom";
 import Login from "./components/Login";
 import Home from "./components/Home";
-import Reports from "./components/Reports";
+import Reports from "./components/pages/Reports";
+import CandidateTracker from "./components/CandidateTracker";
+import AddCandidateForm from "./components/pages/AddCandidateForm";
 // import FrontPage from "./components/FrontPage";
 
 
@@ -30,7 +32,9 @@ function App() {
         <Route path="/searchfilter" element={<SearchFilter/>} />
         <Route path="/search-results" element={<SearchResultsPage/>} />
         <Route path="/form" element={<Form/>} />
-        <Route path="/manual-form" element={<ManualFormPage/>} />
+        <Route path="/add-questions" element={<ManualFormPage />} />
+        <Route path="/candidatetracker" element={<CandidateTracker/>} />
+        <Route path="/add-candidate" element={<AddCandidateForm />} />
         <Route path="/reports" element={<Reports/>} />
         
       </Routes>  

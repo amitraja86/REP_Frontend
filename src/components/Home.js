@@ -18,18 +18,35 @@
 
 import React, { useState } from "react";
 import Navbar from "./Navbar";
-import SearchFilter from "./SearchFilter";
-import Form from "./Form";
+import SideBar from "./SideBar";
+import SearchFilter from "./GetQuestions";
+import Form from "./AddQuestions";
+import CandidateTracker from "./CandidateTracker";
 import "../components/styles/Home.css";
 
 const Home = () => {
-  const [loading, setLoading] = useState(false); // ✅ create loading state
+  const [activeComponent, setActiveComponent] = useState('searchFilter'); // Store active component state
+  const [loading, setLoading] = useState(false);
+
+  // Render active component based on the state
+  const renderActiveComponent = () => {
+    switch (activeComponent) {
+      case 'searchFilter':
+        return <SearchFilter setLoading={setLoading} />;
+      case 'form':
+        return <Form />;
+      case 'candidateTracker':
+        return <CandidateTracker setLoading={setLoading} />;
+      default:
+        return <SearchFilter setLoading={setLoading} />;
+    }
+  };
 
   return (
     <div className="home-container">
       <Navbar />
 
-      {/* ✅ Show overlay when loading is true */}
+      {/* Show overlay when loading is true */}
       {loading && (
         <div className="loading-screen-overlay">
           <div className="spinner" />
@@ -37,9 +54,13 @@ const Home = () => {
         </div>
       )}
 
-      <div className="content">
-        <SearchFilter setLoading={setLoading} /> {/* ✅ pass as prop */}
-        <Form />
+      <div className="main-content">
+        {/* Sidebar */}
+        <SideBar setActiveComponent={setActiveComponent} />
+
+        <div className="content">
+          {renderActiveComponent()} {/* Render the active component */}
+        </div>
       </div>
     </div>
   );

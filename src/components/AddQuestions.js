@@ -141,8 +141,8 @@ const Form = ({ inputTypeFromProps }) => {
     const token = localStorage.getItem("token");
     const apiUrl =
       inputType === "manual"
-        ? "https://recruitment-intelligence.appzlogic.in/api/add_questions/"
-        : "https://recruitment-intelligence.appzlogic.in/api/add_question_by_csv/";
+        ? "http://127.0.0.1:8000/api/v2/add_questions/"
+        : "http://127.0.0.1:8000/api/v2/add_question_by_csv/";
 
         const convertDateTime = (isoDateTime) => {
           if (!isoDateTime) return "";

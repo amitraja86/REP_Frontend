@@ -247,7 +247,7 @@ button:hover {
   justify-content: space-between;
   gap: 12px;
 }
-.open-form-button {
+.open-form-button { 
   width: 100%;
   background: linear-gradient(135deg, #2e3844, #4672a8);
   color: white;
