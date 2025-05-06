@@ -107,6 +107,8 @@ const Home = () => {
         return <CommonQuestionsPage />;
       case "candidateTracker":
         return <CandidateTracker setLoading={setLoading} />;
+      case "addTaskCard":
+        return <AddTaskCard />;
       default:
         return <DashboardWelcome />;
     }
@@ -120,6 +122,10 @@ const Home = () => {
         return "form-bg";
       case "candidateTracker":
         return "candidate-tracker-bg";
+      case "commonQuestions":
+        return "common-questions-bg";
+      case "addTaskCard":
+        return "add-task-card-bg";
       case "dashboardWelcome":
       default:
         return "dashboard-welcome-bg";
@@ -144,6 +150,7 @@ const Home = () => {
             <li onClick={() => handleNavClick("form")}>Add Questions</li>
             <li onClick={() => handleNavClick("commonQuestions")}>Common Questions</li>
             <li onClick={() => handleNavClick("candidateTracker")}>Candidate Tracker</li>
+            <li onClick={() => handleNavClick("addTaskCard")}>Add Task</li>
           </ul>
         </div>
         <div className="nav-right">

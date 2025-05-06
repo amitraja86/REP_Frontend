@@ -30,25 +30,72 @@ const AddTaskCard = ({ onAddTask }) => {
 
   return (
     <>
-      <div className="add-task-card">
-        <button className="add-btn" onClick={() => setShowModal(true)}>
-          + Add Task
-        </button>
+      <div className="card-container">
+        <h2 className="card-title">Add New Task</h2>
+        <p className="card-description">
+          Click the button below to create a new task.
+        </p>
+        <div className="add-task-card">
+          <button className="add-btn" onClick={() => setShowModal(true)}>
+            + Add Task
+          </button>
+        </div>
       </div>
 
       {showModal && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h2>Add New Task</h2>
+            <h2 className="card-title">Add New Task</h2>
+            <p className="card-description">
+              Fill in the task details and click "Add Task" to save it.
+            </p>
             <form className="task-form" onSubmit={handleSubmit}>
-              <input name="title" placeholder="Task Title" value={formData.title} onChange={handleChange} required />
-              <input name="description" placeholder="Task Description" value={formData.description} onChange={handleChange} required />
-              <input name="assignee" placeholder="Assigned To" value={formData.assignee} onChange={handleChange} required />
-              <input name="assignedBy" placeholder="Assigned By" value={formData.assignedBy} onChange={handleChange} required />
-              <input name="duration" placeholder="Time Duration (e.g., 3 days)" value={formData.duration} onChange={handleChange} required />
+              <input
+                name="title"
+                placeholder="Task Title"
+                value={formData.title}
+                onChange={handleChange}
+                required
+              />
+              <input
+                name="description"
+                placeholder="Task Description"
+                value={formData.description}
+                onChange={handleChange}
+                required
+              />
+              <input
+                name="assignee"
+                placeholder="Assigned To"
+                value={formData.assignee}
+                onChange={handleChange}
+                required
+              />
+              <input
+                name="assignedBy"
+                placeholder="Assigned By"
+                value={formData.assignedBy}
+                onChange={handleChange}
+                required
+              />
+              <input
+                name="duration"
+                placeholder="Time Duration (e.g., 3 days)"
+                value={formData.duration}
+                onChange={handleChange}
+                required
+              />
               <div className="form-buttons">
-                <button type="submit">Add Task</button>
-                <button type="button" className="cancel-btn" onClick={() => setShowModal(false)}>Cancel</button>
+                <button type="submit" className="submit-btn">
+                  Add Task
+                </button>
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={() => setShowModal(false)}
+                >
+                  Cancel
+                </button>
               </div>
             </form>
           </div>
