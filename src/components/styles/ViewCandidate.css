@@ -1,0 +1,183 @@
+.view-container {
+    padding: 20px;
+    background-color: #f9f9f9;
+    min-height: 100vh;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  
+  .title {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .search-box {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .email-input {
+    padding: 10px 15px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    width: 300px;
+  }
+  
+  .search-button {
+    padding: 10px 20px;
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-left: 10px;
+  }
+  
+  .search-button:hover {
+    background-color: #1d4ed8;
+  }
+  
+  .loading,
+  .empty-message {
+    text-align: center;
+    color: #888;
+    font-size: 1.2rem;
+  }
+  
+  .card-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+  
+  .candidate-card {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    width: 300px;
+    text-align: center;
+    transition: transform 0.2s;
+  }
+  
+  .candidate-card:hover {
+    transform: scale(1.05);
+  }
+  
+  .candidate-name {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+  }
+  
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+  }
+  
+  .pagination button {
+    padding: 10px;
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    margin: 0 5px;
+  }
+  
+  .pagination button:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+  }
+  
+  .pagination span {
+    font-size: 1rem;
+    margin: 0 10px;
+  }
+  
+  .candidate-details {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .candidate-details h2 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  
+  .candidate-details table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .candidate-details td {
+    padding: 12px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  .candidate-details th {
+    text-align: left;
+    font-weight: bold;
+    color: #2563eb;
+  }
+  
+  .field-label {
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .field-value {
+    color: #666;
+  }
+  
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 800px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .close-modal {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    color: #2563eb;
+    cursor: pointer;
+  }
+  
+  .close-modal:hover {
+    color: #1d4ed8;
+  }
+  

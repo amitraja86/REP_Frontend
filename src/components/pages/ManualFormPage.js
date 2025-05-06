@@ -1,223 +1,263 @@
-import React, { useState } from "react";
-// import "../components/styles/Form.css";
-import "../styles/ManualFormPage.css"; // Import your CSS file for styling
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import "../styles/ManualFormPage.css";
+import axiosInstance from "../../api/axiosInstance";
 
-const ManualForm = () => {
-  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
+const ManualFormPage = () => {
   const [formData, setFormData] = useState({
     candidateName: "",
     endClient: "",
+    customClient: "", // For manual client input
     position: "",
+    customPosition: "", // For manual position input
     location: "",
     panel: "",
     dateTime: "",
     round: 1,
-    status: "pass",
+    status: "Selected",
     manualQuestions: "",
   });
 
-  const resetForm = () => {
-    setFormData({
-      candidateName: "",
-      endClient: "",
-      position: "",
-      location: "",
-      panel: "",
-      dateTime: "",
-      round: 1,
-      status: "pass",
-      manualQuestions: "",
-    });
-  };
+  const [clients, setClients] = useState({});
+  const [positions, setPositions] = useState([]);
+  const [loadingClients, setLoadingClients] = useState(true);
+
+  // Fetch client data on component mount
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        const response = await axiosInstance.get("https://recruitment-intelligence.appzlogic.in/api/company/");
+        setClients(response.data);
+      } catch (error) {
+        console.error("Error fetching clients:", error);
+      } finally {
+        setLoadingClients(false);
+      }
+    };
+
+    fetchClients();
+  }, []);
+
+  // Update positions based on the selected client
+  useEffect(() => {
+    if (formData.endClient && formData.endClient !== "Other" && clients[formData.endClient]) {
+      // If a client is selected and it's not "Other", show positions for that client
+      const data = clients[formData.endClient];
+      setPositions(data[0]?.[0] || []);
+    } else {
+      // If no client is selected or "Other" is selected, show all positions
+      const allPositions = [];
+      Object.values(clients).forEach((entry) => {
+        allPositions.push(...(entry[0]?.[0] || []));
+      });
+      const uniquePositions = [...new Set(allPositions)]; // Remove duplicates
+      setPositions(uniquePositions);
+    }
+  }, [formData.endClient, clients]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
-  };
-//   const handleCSVUpload = (e) => {
-//     const file = e.target.files[0];
-//     if (file && file.type === "text/csv") {
-//       Papa.parse(file, {
-//         header: true,
-//         skipEmptyLines: true,
-//         complete: function (results) {
-//           const data = results.data[0]; // Take first row for simplicity
-  
-//           setFormData((prev) => ({
-//             ...prev,
-//             candidateName: data.candidateName || "",
-//             endClient: data.endClient || "",
-//             position: data.position || "",
-//             location: data.location || "",
-//             panel: data.panel || "",
-//             dateTime: data.dateTime || "",
-//             round: data.round || 1,
-//             status: data.status || "pass",
-//             manualQuestions: data.manualQuestions || "",
-//           }));
-//         }
-//       });
-//     } else {
-//       alert("Please upload a valid CSV file.");
-//     }
-//   };
-  
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const token = localStorage.getItem("token");
-
-    const convertDateTime = (isoDateTime) => {
-      if (!isoDateTime) return "";
-      const dateObj = new Date(isoDateTime);
-      const day = String(dateObj.getDate()).padStart(2, "0");
-      const month = String(dateObj.getMonth() + 1).padStart(2, "0");
-      const year = dateObj.getFullYear();
-      const hours = String(dateObj.getHours()).padStart(2, "0");
-      const minutes = String(dateObj.getMinutes()).padStart(2, "0");
-      return `${day}-${month}-${year} ${hours}:${minutes}`;
-    };
-
-    const body = JSON.stringify({
-      question: formData.manualQuestions,
-      Candidate_name: formData.candidateName,
-      designation: formData.position,
-      L1_Client: formData.endClient,
-      End_Client: formData.endClient,
-      Positions: 0,
-      Country: formData.location,
-      Interview_Panel: formData.panel,
-      Interview_start_time: convertDateTime(formData.dateTime),
-      duration: "30",
-      Round: formData.round,
-      Status: formData.status,
-    });
-
-    try {
-      const response = await fetch(
-        "http://127.0.0.1:8000/api/v2/add_questions/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-            token: token,
-          },
-          body: body,
-        }
-      );
-
-      if (response.ok) {
-        setShowSuccessPopup(true);
-        setTimeout(() => setShowSuccessPopup(false), 3000);
-        resetForm();
-      } else {
-        alert("Failed to submit form");
+    // Validation for string-only fields
+    if (["candidateName", "location", "panel", "customClient", "customPosition"].includes(name)) {
+      const stringRegex = /^[a-zA-Z\s]*$/; // Allow only alphabetic characters and spaces
+      if (!stringRegex.test(value)) {
+        return; // Ignore invalid input
       }
-    } catch (error) {
-      alert("Error submitting form");
     }
+
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const finalData = {
+      ...formData,
+      endClient: formData.endClient === "Other" ? formData.customClient : formData.endClient,
+      position: formData.position === "Other" ? formData.customPosition : formData.position,
+    };
+    console.log("Form submitted:", finalData);
+    // Add your form submission logic here
   };
 
   return (
     <div className="form-page-container">
-      <h2 className="form-modal-title">Add Interview Questions</h2>
-      <form className="interview-form" onSubmit={handleSubmit}>
-        <div className="form-section">
-          <div className="form-group">
-            <div className="form-label">Candidate Name
-            <span className="required-asterisk">*</span>
-            </div>
-            <input type="text" name="candidateName" value={formData.candidateName} onChange={handleChange} required />
-          </div>
-  
-          <div className="form-group">
-            <div className="form-label">Client
-            <span className="required-asterisk">*</span>
-            </div>
-            <input type="text" name="endClient" value={formData.endClient} onChange={handleChange} required />
-          </div>
-  
-          <div className="form-group">
-            <div className="form-label">Position
-            <span className="required-asterisk">*</span>
-            </div>
-            <input type="text" name="position" value={formData.position} onChange={handleChange} required />
-          </div>
-  
-          <div className="form-group">
-            <div className="form-label">Country/City</div>
-            <input type="text" name="location" value={formData.location} onChange={handleChange} />
-          </div>
-  
-          <div className="form-group">
-            <div className="form-label">Panel
-            <span className="required-asterisk">*</span>
-            </div>
-            <input
-              type="text"
-              name="panel"
-              value={formData.panel}
-              onChange={handleChange}
-              required
-              placeholder="Separate names by , and do not use any other symbol"
-            />
-          </div>
-  
-          <div className="form-group">
-            <div className="form-label">Date</div>
-            <input type="datetime-local" name="dateTime" value={formData.dateTime} onChange={handleChange} />
-          </div>
-  
-          <div className="form-group">
-            <div className="form-label">Round</div>
-            <input type="number" name="round" value={formData.round} onChange={handleChange} />
-          </div>
-  
-          <div className="form-group">
-            <div className="form-label">Status</div>
-            <select name="status" value={formData.status} onChange={handleChange}>
-              <option value="Selected">Selected</option>
-              <option value="Reject">Rejected</option>
-              <option value="On Hold">On Hold</option>
-              <option value="Waiting">Awaiting</option>
-            </select>
-          </div>
-  
-          <div className="form-group">
-            <div className="form-label">Manual Questions
-            <span className="required-asterisk">*</span>
-            </div>
-            <textarea
-              name="manualQuestions"
-              value={formData.manualQuestions}
-              onChange={handleChange}
-              required
-              placeholder="Enter questions manually..."
-              rows="5"
-            ></textarea>
-          </div>
-        </div>
-  
-        <div className="form-actions">
-          <button type="submit" className="form-submit-button">Submit</button>
-        </div>
-      </form>
-
-      {showSuccessPopup && (
-        <div className="success-popup-overlay">
-          <div className="success-popup">
-            <span className="close-button" onClick={() => setShowSuccessPopup(false)}>
-              &times;
-            </span>
-            <p>Data added successfully!</p>
-          </div>
-        </div>
-      )}
+  <h2 className="form-modal-title">Add Interview Questions</h2>
+  <form className="interview-form-grid" onSubmit={handleSubmit}>
+    {/* Candidate Name */}
+    <div className="form-row">
+      <label className="form-label required">Candidate Name</label>
+      <input
+        type="text"
+        name="candidateName"
+        value={formData.candidateName}
+        onChange={handleChange}
+        required
+      />
     </div>
+
+    {/* Client Dropdown */}
+    <div className="form-row">
+      <label className="form-label required">Client</label>
+      <select
+        name="endClient"
+        value={formData.endClient}
+        onChange={handleChange}
+        required
+      >
+        <option value="">Select Client</option>
+        {loadingClients ? (
+          <option>Loading clients...</option>
+        ) : (
+          Object.keys(clients).map((client) => (
+            <option key={client} value={client}>
+              {client}
+            </option>
+          ))
+        )}
+        <option value="Other">Other</option>
+      </select>
+    </div>
+
+    {/* Custom Client Input */}
+    {formData.endClient === "Other" && (
+      <div className="form-row">
+        <label className="form-label">Custom Client</label>
+        <input
+          type="text"
+          name="customClient"
+          value={formData.customClient}
+          onChange={handleChange}
+          required
+        />
+      </div>
+    )}
+
+    {/* Position Dropdown */}
+    <div className="form-row">
+      <label className="form-label required">Position</label>
+      <select
+        name="position"
+        value={formData.position}
+        onChange={handleChange}
+        required
+      >
+        <option value="">Select Position</option>
+        {positions.map((position) => (
+          <option key={position} value={position}>
+            {position}
+          </option>
+        ))}
+        <option value="Other">Other</option>
+      </select>
+    </div>
+
+    {/* Custom Position Input */}
+    {formData.position === "Other" && (
+      <div className="form-row">
+        <label className="form-label">Custom Position</label>
+        <input
+          type="text"
+          name="customPosition"
+          value={formData.customPosition}
+          onChange={handleChange}
+          required
+        />
+      </div>
+    )}
+
+    {/* Location */}
+    <div className="form-row">
+      <label className="form-label">Location</label>
+      <input
+        type="text"
+        name="location"
+        value={formData.location}
+        onChange={handleChange}
+      />
+    </div>
+
+    {/* Panel */}
+    <div className="form-row">
+      <label className="form-label required">Panel</label>
+      <input
+        type="text"
+        name="panel"
+        value={formData.panel}
+        onChange={handleChange}
+        required
+      />
+      <small className="panel-subtext">*Panel names should be separated by a comma</small>
+    </div>
+
+    {/* Date */}
+    <div className="form-row">
+      <label className="form-label required">Date</label>
+      <input
+        type="datetime-local"
+        name="dateTime"
+        value={formData.dateTime}
+        onChange={handleChange}
+        required
+      />
+    </div>
+
+    {/* Round */}
+    <div className="form-row">
+      <label className="form-label">Round</label>
+      <select
+        name="round"
+        value={formData.round}
+        onChange={handleChange}
+        required
+      >
+        {[1, 2, 3, 4, 5].map((round) => (
+          <option key={round} value={round}>
+            {round}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    {/* Status */}
+    <div className="form-row">
+      <label className="form-label">Status</label>
+      <select
+        name="status"
+        value={formData.status}
+        onChange={handleChange}
+        required
+      >
+        <option value="Selected">Selected</option>
+        <option value="Rejected">Rejected</option>
+        <option value="On Hold">On Hold</option>
+        <option value="Awaiting">Awaiting</option>
+      </select>
+    </div>
+
+    {/* Manual Questions */}
+    <div className="form-row full-width">
+      <label className="form-label required">Manual Questions</label>
+      <textarea
+        name="manualQuestions"
+        value={formData.manualQuestions}
+        onChange={handleChange}
+        required
+        rows="5"
+      ></textarea>
+    </div>
+
+    <div className="form-actions full-width">
+      <button type="submit">Submit</button>
+    </div>
+  </form>
+</div>
+
   );
 };
 
-export default ManualForm;
+export default ManualFormPage;

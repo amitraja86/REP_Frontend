@@ -46,14 +46,38 @@ const AddCandidateForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const token = localStorage.getItem("token"); // Or however you're storing the auth token
+            const token = localStorage.getItem("token");
+    
+            const mappedData = {
+                Candidate_Name: formData.fullName,
+                Email_ID: formData.email,
+                Contact_No: parseInt(formData.phone),
+                Client: formData.client,
+                Position: formData.position,
+                Interviewer: formData.interviewer,
+                Video_Link: formData.videoUrl,
+                Linkedin_URL: formData.linkedinUrl,
+                TE: formData.totalExperience,
+                CTC: formData.currentCTC,
+                Expected_CTC: formData.expectedCTC,
+                notice_period: parseInt(formData.noticePeriod), // Or map "90 days" to 90
+                serving_notice_period: formData.servingNoticePeriod === "Yes",
+                last_working_day: formData.lastWorkingDay,
+                Feedback: formData.feedback_interviewer,
+                Aman_Feedback: formData.feedback_aman,
+                Dhawal_Feedback: formData.feedback_dhawal,
+                Nimit_Feedback: formData.feedback_nimit,
+                Second_Round_Video_Link: "", // Set if you have a second video URL
+            };
+    
             const response = await fetch("http://127.0.0.1:8000/api/v2/candidate/candidate_tracker/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
+                    "token": token,
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(mappedData),
             });
     
             if (!response.ok) {
@@ -62,32 +86,16 @@ const AddCandidateForm = () => {
             }
     
             const result = await response.json();
-            alert(`Candidate ${result} added successfully!`);
+            alert(`Candidate ${result.Candidate_Name} added successfully!`);
             localStorage.removeItem("candidateFormData");
-            setFormData({
-                fullName: '',
-                email: '',
-                phone: '',
-                client: '',
-                position: '',
-                interviewDate: '',
-                interviewer: '',
-                feedback: '',
-                totalExperience: '',
-                currentCTC: '',
-                expectedCTC: '',
-                linkedinUrl: '',
-                videoUrl: '',
-                currentLocation: '',
-                noticePeriod: '',
-                servingNoticePeriod: '',
-                lastWorkingDay: ''
-            });
+    
+            // Reset form here if needed
         } catch (error) {
             console.error("Error:", error);
             alert(`Error: ${error.message}`);
         }
     };
+    
     
 
     return (
@@ -169,8 +177,6 @@ const AddCandidateForm = () => {
                             </>
                         )}
 
-                        <label>Video URL</label>
-                        <input type="url" name="videoUrl" value={formData.videoUrl} onChange={handleChange} />
                     </fieldset>
                 )}
 
@@ -189,6 +195,15 @@ const AddCandidateForm = () => {
 
                         <label>Interviewer</label>
                         <input type="text" name="interviewer" value={formData.interviewer} onChange={handleChange} required />
+
+                        <label>Round 1 Video </label>
+                        <input type="url" name="videoUrl" value={formData.videoUrl} onChange={handleChange} />
+
+                        <label>Round 2 Video </label>
+                        <input type="url" name="videoUrl" value={formData.videoUrl} onChange={handleChange} />
+
+                        {/* <label>Video URL</label>
+                        <input type="url" name="videoUrl" value={formData.videoUrl} onChange={handleChange} /> */}
                     </fieldset>
                 )}
 

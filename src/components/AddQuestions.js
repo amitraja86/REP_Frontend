@@ -67,6 +67,7 @@
 
 import React, { useState } from "react";
 import "../components/styles/Form.css";
+import axiosInstance from "../api/axiosInstance";
 
 const Form = ({ inputTypeFromProps }) => {
   const [isOpen, setIsOpen] = useState(inputTypeFromProps === "manual");
@@ -208,71 +209,88 @@ const Form = ({ inputTypeFromProps }) => {
 
   return (
     <>
-     <div className="details-card">
-        <h3 className="card-title">Add Questions</h3>
-        <p className="card-description">
-          Please add Interview questions here.
-         <br /> You can either enter the details manually or upload a CSV file.
-        </p>
-          
-        <div className="button-group">
-          <button onClick={() => window.open("/manual-form", "_blank")} className="open-form-button" >
-            Enter Manually
-          </button>
+     <div className="iq-card-container">
+  <h3 className="iq-card-title">Add Questions</h3>
+  <p className="iq-card-description">
+    Please add Interview questions here.
+    <br /> You can either enter the details manually or upload a CSV file.
+  </p>
 
-          <button className="selection-button"
-              onClick={() => {
-              setInputType("csv");
-              // setSelectionOpen(false);
-              setIsOpen(true);
-            }}>
-                Upload CSV File
-          </button>
-        </div>
-      </div>
+  <div className="iq-button-group">
+    <button
+      onClick={() => window.open("/manual-form", "_blank")}
+      className="iq-button-manual"
+    >
+      Enter Manually
+    </button>
 
-      {isOpen && (
-          <div className="form-modal-overlay">
-            <div className="form-modal-content">
-              <span className="form-close-button" onClick={() => setIsOpen(false)}>
-                &times;
-              </span>
-              <h2 className="form-modal-title">
-                {inputType === "manual" ? "Add Interview Questions" : "Upload CSV File"}
-              </h2>
-              <form className="interview-form" onSubmit={handleSubmit}>
-                {inputType === "csv" && (
-                  <div className="form-section">
-                    <label>Upload CSV File</label>
-                    <input type="file" name="questionSet" accept=".csv" onChange={handleFileChange} required />
-                    <div className="template-download">
-                      <a href="/templates/recruitment_questions_template.csv"
-                        download="Recruitment_Questions_Template.csv"
-                        className="template-link"
-                      >
-                        Download CSV Template
-                      </a>
-                    </div>
-                  </div>
-                )}
-                <div className="form-actions">
-                  <button type="button" className="form-cancel-button" 
-                  onClick={() => setIsOpen(false)}>
-                    Cancel
-                  </button>
-                  <button type="submit" className="form-submit-button">Submit</button>
-                </div>
-              </form>
+    <button
+      className="iq-button-csv"
+      onClick={() => {
+        setInputType("csv");
+        setIsOpen(true);
+      }}
+    >
+      Upload CSV File
+    </button>
+  </div>
+</div>
+
+{isOpen && (
+  <div className="iq-modal-overlay">
+    <div className="iq-modal-content">
+      <span className="iq-modal-close" onClick={() => setIsOpen(false)}>
+        &times;
+      </span>
+      <h2 className="iq-modal-title">
+        {inputType === "manual" ? "Add Interview Questions" : "Upload CSV File"}
+      </h2>
+      <form className="iq-form" onSubmit={handleSubmit}>
+        {inputType === "csv" && (
+          <div className="iq-form-section">
+            <label>Upload CSV File</label>
+            <input
+              type="file"
+              name="questionSet"
+              accept=".csv"
+              onChange={handleFileChange}
+              required
+            />
+            <div className="iq-template-download">
+              <a
+                href="/templates/recruitment_questions_template.csv"
+                download="Recruitment_Questions_Template.csv"
+                className="iq-template-link"
+              >
+                Download CSV Template
+              </a>
             </div>
           </div>
         )}
 
-
-      {showSuccessPopup && (
-        <div className="success-popup">
-          <p>Form submitted successfully!</p>
+        <div className="iq-form-actions">
+          <button
+            type="button"
+            className="iq-button-cancel"
+            onClick={() => setIsOpen(false)}
+          >
+            Cancel
+          </button>
+          <button type="submit" className="iq-button-submit">
+            Submit
+          </button>
         </div>
-      )}
+      </form>
+    </div>
+  </div>
+)}
+
+{showSuccessPopup && (
+  <div className="iq-success-popup">
+    <p>Form submitted successfully!</p>
+  </div>
+)}
+
     </>
   );
 };

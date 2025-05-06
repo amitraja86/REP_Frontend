@@ -422,6 +422,8 @@ import { FaSearch } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
 import axios from "axios";
 import "./styles/SearchFilter.css";
+import axiosInstance from "../api/axiosInstance";
+
 
 const SearchFilter = () => {
   const [selectedFilters, setSelectedFilters] = useState({
@@ -432,52 +434,68 @@ const SearchFilter = () => {
 
   const [positions, setPositions] = useState([]);
   const [clients, setClients] = useState({});
-  const [panels, setPanels] = useState([]);
+  // const [panels, setPanels] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadingClients, setLoadingClients] = useState(true);
+  const [loadingPositions, setLoadingPositions] = useState(true);
   const [, setError] = useState("");
   const [showNoDataPopup, setShowNoDataPopup] = useState(false);
 
   const dropdownRef = useRef(null);
+  const token = localStorage.getItem("token");
 
-  // Step 1: Fetch the client data once on mount
   useEffect(() => {
     const fetchClientData = async () => {
       try {
-        const res = await axios.get("http://127.0.0.1:8000/api/v2/company/");
-        setClients(res.data); // Store the entire object with client names as keys
+        const res = await axiosInstance.get("http://127.0.0.1:8000/api/v2/company/", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+            token: token,
+          },
+        });
+        setClients(res.data);
       } catch (error) {
         console.error("Error fetching client data:", error);
+      }finally {
+        setLoadingClients(false);
+        setLoadingPositions(false);
       }
     };
-
     fetchClientData();
-  }, []);
+  }, [token]);
 
-  // Step 2: Update positions and panels based on the selected client
   useEffect(() => {
     const allPositions = [];
-    const allPanels = [];
-
     if (selectedFilters.client && clients[selectedFilters.client]) {
-      // If a client is selected, filter positions and panels for that client
       const data = clients[selectedFilters.client];
       setPositions(data[0]?.[0] || []);
-      setPanels(data[1]?.[0] || []);
     } else {
-      // If no client is selected, gather all positions and panels across clients
       Object.values(clients).forEach((entry) => {
         allPositions.push(...(entry[0]?.[0] || []));
-        allPanels.push(...(entry[1]?.[0] || []));
       });
-
-      // Remove duplicates
-      const uniquePositions = [...new Set(allPositions)];
-      const uniquePanels = [...new Set(allPanels)];
-
-      setPositions(uniquePositions);
-      setPanels(uniquePanels);
+      setPositions([...new Set(allPositions)]);
     }
   }, [selectedFilters.client, clients]);
+
+  // useEffect(() => {
+  //   const allPositions = [];
+  //   const allPanels = [];
+
+  //   if (selectedFilters.client && clients[selectedFilters.client]) {
+  //     const data = clients[selectedFilters.client];
+  //     setPositions(data[0]?.[0] || []);
+  //     setPanels(data[1]?.[0] || []);
+  //   } else {
+  //     Object.values(clients).forEach((entry) => {
+  //       allPositions.push(...(entry[0]?.[0] || []));
+  //       allPanels.push(...(entry[1]?.[0] || []));
+  //     });
+
+  //     setPositions([...new Set(allPositions)]);
+  //     setPanels([...new Set(allPanels)]);
+  //   }
+  // }, [selectedFilters.client, clients]);
 
   const handleSelectFilter = (filter, value) => {
     setSelectedFilters((prev) => ({
@@ -500,8 +518,6 @@ const SearchFilter = () => {
       if (selectedFilters.client) params.append("company_name", selectedFilters.client);
       if (selectedFilters.panel) params.append("panel_name", selectedFilters.panel);
 
-      const token = localStorage.getItem("token");
-
       const response = await axios.get(
         `http://127.0.0.1:8000/api/v2/question/?${params.toString()}`,
         {
@@ -518,6 +534,7 @@ const SearchFilter = () => {
         setError("No results found.");
       } else {
         localStorage.setItem("searchResults", JSON.stringify(response.data.details));
+        localStorage.setItem("searchFilters", JSON.stringify(selectedFilters));
         window.open("/search-results", "_blank");
       }
     } catch (error) {
@@ -532,42 +549,49 @@ const SearchFilter = () => {
     <div ref={dropdownRef} className="search">
       <div className="search-bar">
         <div className="filter-tabs">
-          {/* Client Filter (Now First) */}
+          <h3 className="card-title">Search Questions</h3>
           <div className="filter-group">
             <label>Client</label>
             <div className="select-wrapper">
               <select
                 value={selectedFilters.client}
-                onChange={(e) => setSelectedFilters({ ...selectedFilters, client: e.target.value })}
+                onChange={(e) =>
+                  setSelectedFilters({ ...selectedFilters, client: e.target.value })
+                }
               >
-                <option value="">Select a client</option>
-                {Object.keys(clients).map((clientName) => (
-                  <option key={clientName} value={clientName}>
-                    {clientName}
-                  </option>
-                ))}
+                <option value="">Select Client</option>
+                {loadingClients ? (
+                  <option>Loading clients...</option>
+                  ) : (
+                    Object.keys(clients).map((client) => (
+                      <option key={client} value={client}>
+                        {client}
+                      </option>
+                    ))
+            )}
               </select>
-
               {selectedFilters.client && (
                 <button className="clear-btn" onClick={() => handleSelectFilter("client", "")}>
                   <AiOutlineClose />
                 </button>
               )}
             </div>
-          </div>
-
-          {/* Position Filter */}
-          <div className="filter-group">
+         
             <label>Position</label>
             <div className="select-wrapper">
               <select
                 value={selectedFilters.position}
                 onChange={(e) => handleSelectFilter("position", e.target.value)}
               >
-                <option value="">Select</option>
-                {positions.map((pos) => (
-                  <option key={pos} value={pos}>{pos}</option>
-                ))}
+                <option value="">Select Position</option>
+                {loadingPositions ? (
+                  <option>Loading positions...</option>
+                ) : (
+                  positions.map((pos) => (
+                    <option key={pos} value={pos}>
+                      {pos}
+                    </option>
+                )))}
               </select>
               {selectedFilters.position && (
                 <button className="clear-btn" onClick={() => handleSelectFilter("position", "")}>
@@ -575,46 +599,22 @@ const SearchFilter = () => {
                 </button>
               )}
             </div>
-          </div>
+          
 
-          {/* Panel Filter */}
-          <div className="filter-group">
-            <label>Panel</label>
-            <div className="select-wrapper">
-              <select
-                value={selectedFilters.panel}
-                onChange={(e) => handleSelectFilter("panel", e.target.value)}
-              >
-                <option value="">Select</option>
-                {panels.map((panel) => (
-                  <option key={panel} value={panel}>{panel}</option>
-                ))}
-              </select>
-              {selectedFilters.panel && (
-                <button className="clear-btn" onClick={() => handleSelectFilter("panel", "")}>
-                  <AiOutlineClose />
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Clear All */}
           <button
             className="clear-all-btn"
             onClick={() => setSelectedFilters({ position: "", client: "", panel: "" })}
-            title="Clear all filters"
           >
-            <AiOutlineClose style={{ marginRight: "4px" }} />
+            <AiOutlineClose />
           </button>
 
-          {/* Search Button */}
           <button className="search-btn" onClick={handleSearch}>
-            <FaSearch />
+             <FaSearch />
           </button>
+          </div>
         </div>
       </div>
 
-      {/* No Data Popup */}
       {showNoDataPopup && (
         <div className="popup-overlay">
           <div className="popup-box">
@@ -624,7 +624,6 @@ const SearchFilter = () => {
         </div>
       )}
 
-      {/* Loading Spinner */}
       {loading && (
         <div className="loading-spinner-container">
           <div className="spinner" />

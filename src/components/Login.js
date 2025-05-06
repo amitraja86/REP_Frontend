@@ -139,99 +139,103 @@
 
 
 
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import axios from "axios";
 import illustration from "./images/4630062-removebg-preview.png";
 import appzlogicLogo from "./images/images-2-removebg-preview 1.png";
-import "./styles/Login.css"; // Import your CSS file
+import "./styles/Login.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [errorField, setErrorField] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const validateEmail = (email) => {
+    return /\S+@\S+\.\S+/.test(email);
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError("");
-    setLoading(true); // Start loading
-    
+    setErrorField(null);
+
+    if (!validateEmail(email)) {
+      setErrorField("email");
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const response = await axios.get(
         `http://127.0.0.1:8000/api/v2/user/login/?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
       );
-      console.log("Login successful:", response.data);
+
       const { access_token } = response.data;
       localStorage.setItem("token", access_token);
       navigate("/home");
     } catch (err) {
-      console.error("Login failed:", err);
-      setError("Invalid username or password");
-    } finally{
-      setLoading(false); // Stop loading
+      const errorMessage = err.response?.data?.detail || "Login failed";
+
+      if (errorMessage.toLowerCase().includes("email")) {
+        setErrorField("email");
+        alert("Email not found. Please check your email.");
+      } else if (errorMessage.toLowerCase().includes("password")) {
+        setErrorField("password");
+        alert("Incorrect password. Please try again.");
+      } else {
+        setErrorField("both");
+        alert("Invalid username or password.");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="login-container">
-      {/* Left Panel */}
       <div className="login-left">
         <img src={appzlogicLogo} alt="Appzlogic Logo" className="appzlogic-logo" />
         <h1>WELCOME TO RECRUITMENT INTELLIGENCE</h1>
         <img src={illustration} alt="3D Illustration" className="illustration" />
       </div>
 
-      {/* Right Panel */}
       <div className="login-right">
-        <h2>SIGN IN </h2>
-        {error && <p className="error-message">{error}</p>} {/* Show error message */}
-        
+        <h2>SIGN IN</h2>
         <form onSubmit={handleLogin} className="input-container">
           <label htmlFor="email">Username</label>
-          <input 
-            type="email" 
-            id="email" 
-            placeholder="Enter username" 
-            value={email} 
-            onChange={(e) => setEmail(e.target.value)} 
-            required 
+          <input
+            type="email"
+            id="email"
+            placeholder="Enter username"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className={errorField === "email" || errorField === "both" ? "error-input" : ""}
+            required
           />
 
           <label htmlFor="password">Password</label>
           <div className="password-container">
-            <input 
-              // type={showPassword ? "text" : "password"} 
-              id="password" 
-              placeholder="Enter password" 
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
-              required 
+            <input
+              type={showPassword ? "text" : "password"}
+              id="password"
+              placeholder="Enter password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={errorField === "password" || errorField === "both" ? "error-input" : ""}
+              required
             />
-            {/* <button type="button" onClick={() => setShowPassword(!showPassword)}>👁️</button> */}
           </div>
 
-
-          <button type="submit" className="btn-submit">Sign in</button>
+          <button type="submit" className="btn-submit" disabled={loading}>
+            {loading ? "Signing in..." : "Sign in"}
+          </button>
         </form>
-
       </div>
-      {loading && (
-  <div className="login-loader-wrapper">
-    <div className="login-spinner" />
-    <span className="login-loading-text">Please wait, signing you in...</span>
-  </div>
-)}
-
-
-
-    
-
-
     </div>
   );
 };

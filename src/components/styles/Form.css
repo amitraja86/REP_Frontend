@@ -97,18 +97,82 @@ button:hover {
 
 /* Modal Overlay */
 /* Overlay with fade-in */
-@keyframes fadeSlideIn {
+/* Fade & Slide Animations */
+@keyframes iq-fadeInSlide {
   from {
     opacity: 0;
-    transform: translateY(20px) scale(0.95);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 }
 
-.form-modal-overlay {
+/* Card Container */
+.iq-card-container {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 25px;
+  margin: 20px auto;
+  width: 90%;
+  max-width: 500px;
+  font-family: 'Segoe UI', sans-serif;
+  color: #2b435b;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  animation: iq-fadeInSlide 0.6s ease forwards;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.iq-card-container:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+}
+
+.iq-card-title {
+  font-size: 28px;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #1a237e;
+  text-align: center;
+}
+
+.iq-card-description {
+  font-size: 15px;
+  color: #00000084;
+  margin-bottom: 24px;
+}
+
+/* Button Group */
+.iq-button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.iq-button-manual,
+.iq-button-csv {
+  background: linear-gradient(135deg, #40546d, #3968b5);
+  color: white;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  width: 100%;
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+.iq-button-manual:hover,
+.iq-button-csv:hover {
+  background: #ffffff;
+  color: #1b2633;
+  transform: scale(1.03);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Modal Overlay */
+.iq-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -119,11 +183,11 @@ button:hover {
   justify-content: center;
   align-items: center;
   z-index: 1100;
-  animation: fadeSlideIn 0.3s ease-in-out;
+  animation: iq-fadeInSlide 0.3s ease-in-out;
 }
 
-/* Modal container */
-.form-modal-content {
+/* Modal Content */
+.iq-modal-content {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(8px);
   width: 90%;
@@ -132,291 +196,110 @@ button:hover {
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   position: relative;
-  animation: fadeSlideIn 0.4s ease-in-out;
   overflow-y: auto;
   max-height: 85vh;
+  animation: iq-fadeInSlide 0.4s ease-in-out;
 }
 
-/* Close button */
-.form-close-button {
-  position: absolute;
-  top: 14px;
-  right: 18px;
-  font-size: 24px;
-  color: #333;
-  background: none;
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-  transition: color 0.3s ease, transform 0.2s ease;
-}
-
-.form-close-button:hover {
-  color: #e63946;
-  transform: scale(1.2);
-}
-
-/* Form Title */
-.form-modal-title {
+/* Modal Title */
+.iq-modal-title {
   font-size: 24px;
   font-weight: 600;
   margin-bottom: 20px;
   text-align: center;
   color: #0d0d0d;
-  font-family: 'Segoe UI', sans-serif;
 }
 
-/* Form Container */
-.interview-form {
+/* Close Button */
+.iq-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #2b435b;
+  transition: transform 0.2s ease, color 0.3s ease;
+}
+.iq-modal-close:hover {
+  transform: scale(1.2);
+  color: #e74c3c;
+}
+
+/* Form */
+.iq-form {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.form-submit-button{
-  background: linear-gradient(135deg, #2e3844, #4672a8);
-  color: white;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: 600;
-  transition: background 0.4s ease, transform 0.3s ease;
-}
-.form-submit-button:hover {
-  background: linear-gradient(135deg, #ffffff, #e6e8eb);
-  color: #1f2225;
-  transform: scale(1.05);
-}
-
-.form-cancel-button {
-  background: linear-gradient(135deg, #e63946, #b86060);
-  color: white;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: 600;
-  transition: background 0.4s ease, transform 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-}
-
-.form-cancel-button:hover {
-  background: #ffffff;
-  color: #e63946;
-  border: 1px solid #e63946;
-}
-
-.details-card {
-  background: rgba(255, 255, 255, 0.486);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 25px;
-  width: 500px;
-  font-family: 'Segoe UI', sans-serif;
-  color: #2b435b;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  animation: fadeInSlide 0.6s ease forwards;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.details-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.735);
-}
-
-
-.card-title {
-  font-size: 22px;
-  font-weight: 600;
-  margin-bottom: 12px;
-  color: #1e1c1ca0;
-}
-
-.card-description {
-  font-size: 15px;
-  color: #00000061;
-  margin-bottom: 24px;
-}
-
-.button-group {
-  display:flex;
-  /* flex-direction: column; */
-  justify-content: space-between;
-  gap: 12px;
-}
-.open-form-button { 
-  width: 100%;
-  background: linear-gradient(135deg, #2e3844, #4672a8);
-  color: white;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: 600;
-  transition: background 0.4s ease, transform 0.3s ease;
-}
-
-.open-form-button:hover {
-  background: linear-gradient(135deg, #ffffff, #e6e8eb);
-  color: #263e5e;
-  transform: scale(1.05);
-}
-
-
-/* Modal Overlay - with fade-in animation */
-/* Overlay with fade-in */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
+.iq-form-actions {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  animation: fadeIn 0.4s ease-in-out;
-  z-index: 999;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 30px;
 }
 
-/* Card with pop and blur effect */
-@keyframes popUp {
-  from {
-    transform: translateY(20px) scale(0.95);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-  }
-}
-
-.selection-card {
-  background: rgb(255, 255, 255);
-  backdrop-filter: blur(10px);
-  padding: 30px 25px;
-  border-radius: 16px;
-  width: 90%;
-  max-width: 400px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
-  animation: popUp 0.5s ease forwards;
-  position: relative;
-  text-align: center;
-  color: #000000;
-  font-family: 'Segoe UI', sans-serif;
-}
-
-/* Modal Title */
-.modal-title {
-  font-size: 22px;
-  font-weight: 600;
-  margin-bottom: 20px;
-}
-
-/* Buttons */
-.selection-button {
-  background: linear-gradient(135deg, #1f2d3f, #3968b5);
-  color: white;
-  padding: 12px 18px;
+.iq-button-cancel,
+.iq-button-submit {
+  padding: 12px;
+  font-size: 16px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 16px;
   font-weight: 500;
-  width: 100%;
-  margin: 10px 0;
-  transition: transform 0.2s ease, background 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+.iq-button-cancel {
+  background-color: #ff0000;
+  color: #ffffff;
+}
+.iq-button-cancel:hover {
+  background-color: #e73232bf;
+  transform: translateY(-1px);
+}
+.iq-button-submit {
+  background-color: #3498db;
+  color: #fff;
+}
+.iq-button-submit:hover {
+  background-color: #2980b9;
+  transform: translateY(-1px);
 }
 
-.selection-button:hover {
-  background: #ffffff;
-  color: #1b2633;
-  transform: scale(1.03);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+/* Template Download Link */
+.iq-template-link {
+  color: #2980b9;
+  font-weight: 500;
+  text-decoration: underline;
 }
-
-/* Close Button */
-.close-button {
-  position: absolute;
-  top: 14px;
-  right: 18px;
-  font-size: 24px;
-  color: #2b435b;
-  cursor: pointer;
-  font-weight: bold;
-  transition: transform 0.2s ease, color 0.3s ease;
-}
-
-.close-button:hover {
-  transform: scale(1.2);
-  color: #e74c3c;
-}
-
 
 /* Success Popup */
-.success-popup-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.success-popup {
+.iq-success-popup {
   background: #d4edda;
   border-left: 5px solid #28a745;
   color: #155724;
   padding: 15px;
   font-weight: bold;
   text-align: center;
-  position: relative;
+  position: fixed;
   max-width: 400px;
   width: 90%;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
   border-radius: 10px;
-  animation: fadeIn 0.3s ease-in-out;
+  animation: iq-fadeInSlide 0.3s ease-in-out;
+  z-index: 1200;
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
+/* Responsive Design */
+@media (min-width: 600px) {
+  .iq-button-group {
+    flex-direction: row;
   }
-  to {
-    opacity: 1;
-  }
-}
-@keyframes slideIn {
-  from {
-    transform: translateY(-20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes fadeInSlide {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  .iq-form-actions {
+    flex-direction: row;
+    justify-content: center;
   }
 }
