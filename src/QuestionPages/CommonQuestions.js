@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { FiDownload, FiCopy } from "react-icons/fi";
 import { saveAs } from "file-saver";
-// import axios from "axios";
+import axios from "axios";
 import htmlDocx from "html-docx-js/dist/html-docx";
 import "../styles/CommonQuestions.css";
-import axiosInstance from "../api/axiosInstance"; // Adjust the import path as necessary
-import { API_URL } from "../Constants"; 
+import axiosInstance from "../api/axiosInstance"; 
+import { API_URL } from "../config/apiConfig"; 
 
 // ... (imports remain the same)
 
@@ -30,7 +30,7 @@ const CommonQuestionsPage = () => {
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const response = await axiosInstance.get(`${API_URL}/company/`, {
+        const response = await axios.get(`${API_URL}/company/`, {
           headers: {
             Authorization: `Bearer ${token}`,
             token: token,

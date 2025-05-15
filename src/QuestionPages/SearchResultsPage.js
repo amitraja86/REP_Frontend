@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FiDownload, FiCopy, FiEdit2, FiSave } from "react-icons/fi";
 import "../styles/SearchResultsPage.css";
 import { Document, Packer, Paragraph, TextRun } from "docx";
-import { API_URL } from "../Constants";
+import { API_URL } from "../config/apiConfig";
 
 const SearchResultsPage = () => {
   const [searchResults, setSearchResults] = useState([]);

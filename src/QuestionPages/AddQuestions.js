@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "../styles/Form.css";
-import { API_URL } from "../Constants";
+import { API_URL } from "../config/apiConfig";
 // import axiosInstance from "../api/axiosInstance";
 
 const Form = ({ inputTypeFromProps }) => {

@@ -3,7 +3,7 @@ import "../styles/ManualFormPage.css";
 import { jwtDecode } from "jwt-decode";
 import axiosInstance from "../api/axiosInstance";
 import Swal from "sweetalert2"; // ✅ Imported SweetAlert2
-import { API_URL } from "../Constants"; 
+import { API_URL } from "../config/apiConfig"; 
 
 const ManualForm = () => {
   const [clients, setClients] = useState({});
