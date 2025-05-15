@@ -5,7 +5,8 @@ import axios from "axios";
 import htmlDocx from "html-docx-js/dist/html-docx";
 import "../styles/CommonQuestions.css";
 import axiosInstance from "../api/axiosInstance"; 
-import { API_URL } from "../config/apiConfig"; 
+import API from "../api/api";
+// import { API_URL } from "../config/apiConfig";
 
 // ... (imports remain the same)
 
@@ -27,27 +28,41 @@ const CommonQuestionsPage = () => {
 
   const token = localStorage.getItem("token");
 
+  // useEffect(() => {
+  //   const fetchClients = async () => {
+  //     try {
+  //       const response = await axios.get(`${API_URL}/company/`, {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //           token: token,
+  //         },
+  //       });
+  //       setClients(response.data);
+  //     } catch (err) {
+  //       console.error("Failed to fetch clients and positions", err);
+  //     } finally {
+  //       setLoadingClients(false);
+  //       setLoadingPositions(false);
+  //       setLoadingPanels(false);
+  //     }
+  //   };
+
+  //   fetchClients();
+  // }, [token]);
   useEffect(() => {
-    const fetchClients = async () => {
+    const fetchClientData = async () => {
       try {
-        const response = await axios.get(`${API_URL}/company/`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            token: token,
-          },
-        });
-        setClients(response.data);
-      } catch (err) {
-        console.error("Failed to fetch clients and positions", err);
+        const data = await API.fetchClients();
+        setClients(data);
+      } catch (error) {
+        console.error("Error fetching client data:", error);
       } finally {
         setLoadingClients(false);
         setLoadingPositions(false);
-        setLoadingPanels(false);
       }
     };
-
-    fetchClients();
-  }, [token]);
+    fetchClientData();
+  }, []);
 
   useEffect(() => {
     if (!selectedClient) {

@@ -25,10 +25,17 @@ function showTokenExpiredPopup() {
   }, 3000); // 3 seconds
 }
 
+// const axiosInstance = axios.create({
+//   // baseURL: "http://127.0.0.1:8000/api/v2",
+//   // baseURL: "https://recruitment-intelligence.appzlogic.in/api/"
+//   baseURL: process.env.REACT_APP_API_BASE_URL
+// });
 const axiosInstance = axios.create({
-  baseURL: "http://127.0.0.1:8000/api/v2",
+  baseURL: process.env.REACT_APP_API_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
-
 // Attach token to each request
 axiosInstance.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");

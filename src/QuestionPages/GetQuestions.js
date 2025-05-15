@@ -4,6 +4,7 @@ import { AiOutlineClose } from "react-icons/ai";
 import Swal from "sweetalert2";
 import "../styles/SearchFilter.css";
 import axiosInstance from "../api/axiosInstance";
+import API from "../api/api";
 
 const SearchFilter = () => {
   const [selectedFilters, setSelectedFilters] = useState({
@@ -22,17 +23,32 @@ const SearchFilter = () => {
   const dropdownRef = useRef(null);
   const token = localStorage.getItem("token");
 
+  // useEffect(() => {
+  //   const fetchClientData = async () => {
+  //     try {
+  //       const res = await axiosInstance.get("/company/", {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //           "Content-Type": "application/json",
+  //           token: token,
+  //         },
+  //       });
+  //       setClients(res.data);
+  //     } catch (error) {
+  //       console.error("Error fetching client data:", error);
+  //     } finally {
+  //       setLoadingClients(false);
+  //       setLoadingPositions(false);
+  //     }
+  //   };
+  //   fetchClientData();
+  // }, [token]);
+
   useEffect(() => {
     const fetchClientData = async () => {
       try {
-        const res = await axiosInstance.get("/company/", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-            token: token,
-          },
-        });
-        setClients(res.data);
+        const data = await API.fetchClients();
+        setClients(data);
       } catch (error) {
         console.error("Error fetching client data:", error);
       } finally {
@@ -41,7 +57,7 @@ const SearchFilter = () => {
       }
     };
     fetchClientData();
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     const allPositions = [];
