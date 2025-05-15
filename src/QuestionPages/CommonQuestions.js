@@ -4,28 +4,33 @@ import { saveAs } from "file-saver";
 // import axios from "axios";
 import htmlDocx from "html-docx-js/dist/html-docx";
 import "../styles/CommonQuestions.css";
-import axiosInstance from "../../api/axiosInstance"; // Adjust the import path as necessary
+import axiosInstance from "../api/axiosInstance"; // Adjust the import path as necessary
+import { API_URL } from "../Constants"; 
+
+// ... (imports remain the same)
 
 const CommonQuestionsPage = () => {
   const [clients, setClients] = useState({});
   const [selectedClient, setSelectedClient] = useState("");
   const [selectedPosition, setSelectedPosition] = useState("");
-  const [selectedPanel, setSelectedPanel] = useState(""); // ← NEW
+  const [selectedPanel, setSelectedPanel] = useState("");
   const [positions, setPositions] = useState([]);
-  const [panels, setPanels] = useState([]); // ← NEW
+  const [panels, setPanels] = useState([]);
   const [commonQuestions, setCommonQuestions] = useState([]);
   const [commonError, setCommonError] = useState("");
   const [showCommonPopup, setShowCommonPopup] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingClients, setLoadingClients] = useState(true);
   const [loadingPositions, setLoadingPositions] = useState(true);
-  const [loadingPanels, setLoadingPanels] = useState(true); 
+  const [loadingPanels, setLoadingPanels] = useState(true);
+  const [showWarning, setShowWarning] = useState(false);
+
   const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const response = await axiosInstance.get("http://127.0.0.1:8000/api/v2/company/", {
+        const response = await axiosInstance.get(`${API_URL}/company/`, {
           headers: {
             Authorization: `Bearer ${token}`,
             token: token,
@@ -34,18 +39,17 @@ const CommonQuestionsPage = () => {
         setClients(response.data);
       } catch (err) {
         console.error("Failed to fetch clients and positions", err);
-      }finally {
-            setLoadingClients(false);
-            setLoadingPositions(false);
-            setLoadingPanels(false);
-        }
+      } finally {
+        setLoadingClients(false);
+        setLoadingPositions(false);
+        setLoadingPanels(false);
+      }
     };
 
     fetchClients();
   }, [token]);
 
   useEffect(() => {
-    // If no client is selected, show all positions and panels
     if (!selectedClient) {
       const allPositions = [];
       const allPanels = [];
@@ -57,26 +61,31 @@ const CommonQuestionsPage = () => {
       setPositions([...new Set(allPositions)]);
       setPanels([...new Set(allPanels)]);
     } else {
-      // Filter positions and panels based on selected client
       const data = clients[selectedClient];
       setPositions(data[0]?.[0] || []);
       setPanels(data[1]?.[0] || []);
     }
   }, [selectedClient, clients]);
 
+  const handleClientChange = (e) => {
+    setSelectedClient(e.target.value);
+    setSelectedPosition(""); // Clear position when client changes
+  };
+
   const handleFetchCommonQuestions = async () => {
     setCommonError("");
     setCommonQuestions([]);
 
     if (!selectedClient || !selectedPosition) {
-      setCommonError("Please select both Client and Position.");
+      setShowWarning(true);
       return;
     }
+
     setLoading(true);
 
     try {
       const res = await axiosInstance.get(
-        `http://127.0.0.1:8000/api/v2/get_common_question/?company_name=${selectedClient}&position_name=${selectedPosition}&panel_name=${selectedPanel}`,
+        `/get_common_question/?company_name=${selectedClient}&position_name=${selectedPosition}&panel_name=${selectedPanel}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -103,42 +112,61 @@ const CommonQuestionsPage = () => {
 
   const handleDownloadWord = () => {
     const htmlContent = `
-      <html>
-        <head><meta charset="utf-8"></head>
-        <body>
-          <h2>Common Interview Questions</h2>
-          <ul>
-            ${commonQuestions.map(q => `<li>${q}</li>`).join("")}
-          </ul>
-        </body>
-      </html>
-    `;
+          <html>
+            <head><meta charset="utf-8"></head>
+            <body>
+              <h2>Common Interview Questions</h2>
+              <ul>
+                ${commonQuestions.map((q) => `<li>${q}</li>`).join("")}
+              </ul>
+            </body>
+          </html>
+        `;
 
     const blob = htmlDocx.asBlob(htmlContent);
-    saveAs(blob, "CommonQuestions.docx");
+
+    // Generate filename including client and position name
+    const fileName =
+      `CommonQuestions_${selectedClient}_${selectedPosition}.docx`.replace(
+        /\s+/g,
+        "_"
+      );
+
+    saveAs(blob, fileName);
+  };
+
+  const clearFilters = () => {
+    setSelectedClient("");
+    setSelectedPosition("");
+    setSelectedPanel("");
   };
 
   return (
     <div className="common-question-page">
       <h2>Get Common Interview Questions</h2>
       <p>
-        Select a client and position to retrieve the most commonly asked interview questions.
+        Select a client and position to retrieve the most commonly asked
+        interview questions.
       </p>
 
       <div className="dropdown-row">
-        <select value={selectedClient} onChange={(e) => setSelectedClient(e.target.value)}>
+        <select value={selectedClient} onChange={handleClientChange}>
           <option value="">Select Client</option>
           {loadingClients ? (
             <option>Loading clients...</option>
-            ) : (
-          Object.keys(clients).map((client) => (
-            <option key={client} value={client}>
-              {client}
-            </option>
-          )))}
+          ) : (
+            Object.keys(clients).map((client) => (
+              <option key={client} value={client}>
+                {client}
+              </option>
+            ))
+          )}
         </select>
 
-        <select value={selectedPosition} onChange={(e) => setSelectedPosition(e.target.value)}>
+        <select
+          value={selectedPosition}
+          onChange={(e) => setSelectedPosition(e.target.value)}
+        >
           <option value="">Select Position</option>
           {loadingPositions ? (
             <option>Loading positions...</option>
@@ -147,21 +175,8 @@ const CommonQuestionsPage = () => {
               <option key={pos} value={pos}>
                 {pos}
               </option>
-            )))}
-     
-        </select>
-
-        {/* NEW Panel Dropdown */}
-        <select value={selectedPanel} onChange={(e) => setSelectedPanel(e.target.value)}>
-          <option value="">Select Panel</option>
-          {loadingPanels ? (
-            <option>Loading panels...</option>
-          ) : (
-           panels.map((panel) => (
-            <option key={panel} value={panel}>
-              {panel}
-            </option>
-          )))}
+            ))
+          )}
         </select>
 
         <button
@@ -171,6 +186,10 @@ const CommonQuestionsPage = () => {
         >
           {loading ? <span className="spinner"></span> : "Get Questions"}
         </button>
+
+        <button onClick={clearFilters} className="clear-button">
+          Clear Filters
+        </button>
       </div>
 
       {commonError && <p className="error-text">{commonError}</p>}
@@ -178,13 +197,7 @@ const CommonQuestionsPage = () => {
       {showCommonPopup && (
         <div className="popup-overlay">
           <div className="popup-box">
-            <h4>Common Questions</h4>
-            <ul>
-              {commonQuestions.map((q, i) => (
-                <li key={i}>{q}</li>
-              ))}
-            </ul>
-            <div className="popup-actions">
+            <div className="popup-actions fixed-actions">
               <button onClick={handleCopyToClipboard}>
                 <FiCopy /> Copy
               </button>
@@ -193,6 +206,24 @@ const CommonQuestionsPage = () => {
               </button>
               <button onClick={() => setShowCommonPopup(false)}>Close</button>
             </div>
+            <h4>Common Questions</h4>
+            <div className="question-list scrollable-list">
+              {commonQuestions.map((q, i) => (
+                <div className="question-card" key={i}>
+                  <span className="question-number">{i + 1}.</span>
+                  <span className="question-text">{q}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+      {showWarning && (
+        <div className="popup-overlay">
+          <div className="popup-box warning-box">
+            <h4>Missing Selection</h4>
+            <p>Please select both a Client and a Position to proceed.</p>
+            <button onClick={() => setShowWarning(false)}>OK</button>
           </div>
         </div>
       )}

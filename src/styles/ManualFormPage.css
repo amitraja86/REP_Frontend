@@ -134,6 +134,10 @@ textarea {
   font-weight: 500;
 }
 
+.required-asterisk{
+  color: red;
+}
+
 @media (max-width: 768px) {
   .interview-form-grid {
     grid-template-columns: 1fr;

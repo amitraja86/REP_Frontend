@@ -1,6 +1,6 @@
 // src/components/AddTaskCard.jsx
 import React, { useState } from "react";
-import "./styles/Task.css";
+import "../styles/Task.css";
 
 const AddTaskCard = ({ onAddTask }) => {
   const [showModal, setShowModal] = useState(false);
@@ -9,7 +9,7 @@ const AddTaskCard = ({ onAddTask }) => {
     description: "",
     assignee: "",
     assignedBy: "",
-    duration: ""
+    duration: "",
   });
 
   const handleChange = (e) =>
@@ -23,7 +23,7 @@ const AddTaskCard = ({ onAddTask }) => {
       description: "",
       assignee: "",
       assignedBy: "",
-      duration: ""
+      duration: "",
     });
     setShowModal(false);
   };

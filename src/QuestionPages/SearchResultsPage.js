@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FiDownload, FiCopy, FiEdit2, FiSave } from "react-icons/fi";
 import "../styles/SearchResultsPage.css";
 import { Document, Packer, Paragraph, TextRun } from "docx";
-
+import { API_URL } from "../Constants";
 
 const SearchResultsPage = () => {
   const [searchResults, setSearchResults] = useState([]);
@@ -19,12 +19,11 @@ const SearchResultsPage = () => {
   });
   const [searchQuery, setSearchQuery] = useState("");
 
-   
-
-
   useEffect(() => {
     const data = localStorage.getItem("searchResults");
-    const storedFilters = JSON.parse(localStorage.getItem("searchFilters") || "{}");
+    const storedFilters = JSON.parse(
+      localStorage.getItem("searchFilters") || "{}"
+    );
 
     const normalizedFilters = {
       Client: storedFilters.client || "",
@@ -35,7 +34,8 @@ const SearchResultsPage = () => {
     setFilters(normalizedFilters);
 
     const onlyClient = normalizedFilters.Client && !normalizedFilters.Position;
-    const onlyPosition = normalizedFilters.Position && !normalizedFilters.Client;
+    const onlyPosition =
+      normalizedFilters.Position && !normalizedFilters.Client;
 
     if (onlyClient) {
       setShowPositionColumn(true);
@@ -54,10 +54,11 @@ const SearchResultsPage = () => {
   const handleDownload = async (rowData) => {
     const filename = `Position_${rowData.Positions.replace(/\s/g, "_")}.docx`;
 
-    const formattedQuestions = rowData.question.split("\n").map((line, i) =>
-      new Paragraph({
-        children: [new TextRun({ text: `${i + 1}. ${line}`, break: 1 })],
-      })
+    const formattedQuestions = rowData.question.split("\n").map(
+      (line, i) =>
+        new Paragraph({
+          children: [new TextRun({ text: `${i + 1}. ${line}`, break: 1 })],
+        })
     );
 
     const doc = new Document({
@@ -100,6 +101,7 @@ const SearchResultsPage = () => {
       L1_Client: row.L1_Client,
       End_Client: row.End_Client,
       Positions: row.designation,
+      log_by: row.log_by,
       Location: row.Location,
       Source_type: row.Source_type,
       Country: row.Country,
@@ -111,15 +113,18 @@ const SearchResultsPage = () => {
     };
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/v2/update_question/?quesiton_id=${question_id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-          token: localStorage.getItem("token") || "",
-        },
-        body: JSON.stringify(updatePayload),
-      });
+      const response = await fetch(
+        `${API_URL}/update_question/?quesiton_id=${question_id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+            token: localStorage.getItem("token") || "",
+          },
+          body: JSON.stringify(updatePayload),
+        }
+      );
 
       if (!response.ok) throw new Error("Failed to update");
 
@@ -136,12 +141,11 @@ const SearchResultsPage = () => {
     }
   };
 
-  const filteredResults = searchResults.filter((row) =>
-    row.Candidate_name.toLowerCase().includes(searchQuery.toLowerCase())&&
-    row.Status.toLowerCase().includes(searchQuery.toLowerCase()) 
+  const filteredResults = searchResults.filter(
+    (row) =>
+      row.Candidate_name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      row.Status.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  
 
   return (
     <div className="overlay">
@@ -157,14 +161,26 @@ const SearchResultsPage = () => {
           />
         </div>
 
-              {/* Filters */}
+        {/* Filters */}
         {Object.keys(filters).length > 0 && (
           <div className="filters-display">
             <strong>Selected Filters:</strong>
             <ul>
-              {filters.Client && <li><strong>Client:</strong> {filters.Client}</li>}
-              {filters.Position && <li><strong>Position:</strong> {filters.Position}</li>}
-              {filters.Panel && <li><strong>Panel:</strong> {filters.Panel}</li>}
+              {filters.Client && (
+                <li>
+                  <strong>Client:</strong> {filters.Client}
+                </li>
+              )}
+              {filters.Position && (
+                <li>
+                  <strong>Position:</strong> {filters.Position}
+                </li>
+              )}
+              {filters.Panel && (
+                <li>
+                  <strong>Panel:</strong> {filters.Panel}
+                </li>
+              )}
             </ul>
           </div>
         )}
@@ -178,6 +194,7 @@ const SearchResultsPage = () => {
                 <th>Candidate Name</th>
                 {showClientColumn && <th>Client</th>}
                 {showPositionColumn && <th>Position</th>}
+                <th>Recruiter</th>
                 <th>Country</th>
                 <th>Round</th>
                 <th>Date</th>
@@ -191,7 +208,10 @@ const SearchResultsPage = () => {
                 const isEditing = index === editIndex;
                 const dateTime = new Date(row.Interview_starttime);
                 const date = dateTime.toLocaleDateString();
-                const time = dateTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+                const time = dateTime.toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                });
 
                 return (
                   <tr key={index}>
@@ -199,7 +219,9 @@ const SearchResultsPage = () => {
                       {isEditing ? (
                         <input
                           value={editedRow.Candidate_name}
-                          onChange={(e) => handleInputChange("Candidate_name", e.target.value)}
+                          onChange={(e) =>
+                            handleInputChange("Candidate_name", e.target.value)
+                          }
                         />
                       ) : (
                         row.Candidate_name
@@ -210,7 +232,9 @@ const SearchResultsPage = () => {
                         {isEditing ? (
                           <input
                             value={editedRow.L1_Client}
-                            onChange={(e) => handleInputChange("L1_Client", e.target.value)}
+                            onChange={(e) =>
+                              handleInputChange("L1_Client", e.target.value)
+                            }
                           />
                         ) : (
                           row.L1_Client
@@ -222,7 +246,9 @@ const SearchResultsPage = () => {
                         {isEditing ? (
                           <input
                             value={editedRow.Positions}
-                            onChange={(e) => handleInputChange("Positions", e.target.value)}
+                            onChange={(e) =>
+                              handleInputChange("Positions", e.target.value)
+                            }
                           />
                         ) : (
                           row.Positions
@@ -232,8 +258,22 @@ const SearchResultsPage = () => {
                     <td>
                       {isEditing ? (
                         <input
+                          value={editedRow.log_by}
+                          onChange={(e) =>
+                            handleInputChange("log_by", e.target.value)
+                          }
+                        />
+                      ) : (
+                        row.log_by
+                      )}
+                    </td>
+                    <td>
+                      {isEditing ? (
+                        <input
                           value={editedRow.Country}
-                          onChange={(e) => handleInputChange("Country", e.target.value)}
+                          onChange={(e) =>
+                            handleInputChange("Country", e.target.value)
+                          }
                         />
                       ) : (
                         row.Country
@@ -243,7 +283,9 @@ const SearchResultsPage = () => {
                       {isEditing ? (
                         <input
                           value={editedRow.Round}
-                          onChange={(e) => handleInputChange("Round", e.target.value)}
+                          onChange={(e) =>
+                            handleInputChange("Round", e.target.value)
+                          }
                         />
                       ) : (
                         row.Round
@@ -257,7 +299,9 @@ const SearchResultsPage = () => {
                       {isEditing ? (
                         <input
                           value={editedRow.Status}
-                          onChange={(e) => handleInputChange("Status", e.target.value)}
+                          onChange={(e) =>
+                            handleInputChange("Status", e.target.value)
+                          }
                         />
                       ) : (
                         row.Status
@@ -268,7 +312,9 @@ const SearchResultsPage = () => {
                         <textarea
                           className="question-edit-box"
                           value={editedRow.question}
-                          onChange={(e) => handleInputChange("question", e.target.value)}
+                          onChange={(e) =>
+                            handleInputChange("question", e.target.value)
+                          }
                         />
                       ) : (
                         <div className="question-scroll">
@@ -308,10 +354,14 @@ const SearchResultsPage = () => {
                         }
                         title={isEditing ? "Save" : "Edit"}
                       >
-                        {isEditing ? <FiSave size={18} /> : <FiEdit2 size={18} />}
+                        {isEditing ? (
+                          <FiSave size={18} />
+                        ) : (
+                          <FiEdit2 size={18} />
+                        )}
                       </button>
                     </td>
-                  </tr>   
+                  </tr>
                 );
               })}
             </tbody>

@@ -1,31 +1,15 @@
-// import React from "react";
-// import Navbar from "../components/Navbar";
-// import Form from "../components/Form";
-// import SearchFilter from "../components/SearchFilter";
-// import "./styles/Home.css"; 
-
-// const Home = () => {
-//   return (
-//     <div className="home-container">
-//       <Navbar />
-//       <SearchFilter />
-//       <Form />
-//     </div>
-//   );
-// };
-
-// export default Home;
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardWelcome from "./DashboardWelcome";
-import SearchFilter from "./GetQuestions";
-import Form from "./AddQuestions";
-import CandidateTracker from "./CandidateTracker";
-import CommonQuestionsPage from "./pages/CommonQuestions";
+import SearchFilter from "../QuestionPages/GetQuestions";
+import Form from "../QuestionPages/AddQuestions";
+import CandidateTracker from "../CandidatePages/CandidateTracker";
+import CommonQuestionsPage from "../QuestionPages/CommonQuestions";
 import AddTaskCard from "./Task";
-import logo from "../components/images/images-2-removebg-preview 1.png";
-import "../components/styles/Home.css";
+import ReportPage from "./Reports";
+// import logo from "";
+import "../styles/Home.css";
+import Swal from "sweetalert2";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -34,29 +18,21 @@ const Home = () => {
   const [loading, setLoading] = useState(false);
 
   // Show popup and redirect to login
-  const showSessionExpiredAndRedirect = () => {
-    const popup = document.createElement("div");
-    popup.innerText = "Session expired. Redirecting to login...";
-    Object.assign(popup.style, {
-      position: "fixed",
-      top: "20px",
-      right: "20px",
-      backgroundColor: "#f44336",
-      color: "#fff",
-      padding: "12px 24px",
-      borderRadius: "6px",
-      boxShadow: "0px 0px 10px rgba(0,0,0,0.2)",
-      zIndex: 9999,
-      fontSize: "16px",
-    });
-    document.body.appendChild(popup);
 
-    setTimeout(() => {
-      popup.remove();
-      localStorage.removeItem("token");
-      localStorage.removeItem("userId");
-      navigate("/");
-    }, 3000);
+  const showSessionExpiredAndRedirect = () => {
+    Swal.fire({
+      icon: "warning",
+      title: "Session Expired",
+      text: "Redirecting to login...",
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      didClose: () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("userId");
+        navigate("/");
+      },
+    });
   };
 
   const isTokenValid = () => {
@@ -71,12 +47,22 @@ const Home = () => {
   }, [navigate]);
 
   const handleLogout = () => {
-    const confirmLogout = window.confirm("Are you sure you want to logout?");
-    if (confirmLogout) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("userId");
-      navigate("/");
-    }
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You will be logged out of your session.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, logout",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("userId");
+        navigate("/");
+      }
+    });
   };
 
   const handleLogoClick = () => {
@@ -109,6 +95,8 @@ const Home = () => {
         return <CandidateTracker setLoading={setLoading} />;
       case "addTaskCard":
         return <AddTaskCard />;
+      case "report":
+        return <ReportPage />;
       default:
         return <DashboardWelcome />;
     }
@@ -126,6 +114,8 @@ const Home = () => {
         return "common-questions-bg";
       case "addTaskCard":
         return "add-task-card-bg";
+      case "report":
+        return "report-bg";
       case "dashboardWelcome":
       default:
         return "dashboard-welcome-bg";
@@ -137,7 +127,7 @@ const Home = () => {
       <div className="top-nav">
         <div className="nav-left">
           <img
-            src={logo}
+            src="/assets/images/images-2-removebg-preview 1.png"
             alt="Appzlogic Logo"
             className="nav-logo"
             onClick={handleLogoClick}
@@ -146,11 +136,18 @@ const Home = () => {
         </div>
         <div className="nav-center">
           <ul className="nav-links">
-            <li onClick={() => handleNavClick("searchFilter")}>Get Questions</li>
+            <li onClick={() => handleNavClick("searchFilter")}>
+              Get Questions
+            </li>
             <li onClick={() => handleNavClick("form")}>Add Questions</li>
-            <li onClick={() => handleNavClick("commonQuestions")}>Common Questions</li>
-            <li onClick={() => handleNavClick("candidateTracker")}>Candidate Tracker</li>
+            <li onClick={() => handleNavClick("commonQuestions")}>
+              Common Questions
+            </li>
+            <li onClick={() => handleNavClick("candidateTracker")}>
+              Candidate Tracker
+            </li>
             <li onClick={() => handleNavClick("addTaskCard")}>Add Task</li>
+            <li onClick={() => handleNavClick("report")}>Reports</li>
           </ul>
         </div>
         <div className="nav-right">
